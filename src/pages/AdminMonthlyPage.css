@@ -396,7 +396,7 @@
 .adminMonthly .staffChips {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: nowrap;
   min-width: 0;
   flex: 1 1 auto;
@@ -454,7 +454,7 @@
 }
 
 .adminMonthly .staffChips .chip {
-  padding: 6px 8px;
+  padding: 6px 7px;
   line-height: 1.15;
   flex: 1 1 0;
   min-width: 0;
@@ -478,11 +478,12 @@
 
 .adminMonthly .staffChips .chipValue {
   flex-shrink: 0;
+  min-width: 44px;
 }
 
 @media (max-width: 390px) {
   .adminMonthly .staffChips .chip {
-    padding: 6px 7px;
+    padding: 5px 7px;
   }
   .adminMonthly .staffChips .chipLabel,
   .adminMonthly .staffChips .chipValue {
