@@ -4,6 +4,7 @@ import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
 import { useI18n } from "../i18n/I18nProvider";
 import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
+import PageHeader from "../components/PageHeader";
 import "./AdminRecordsPage.css";
 
 type TodayStatusCode = "working" | "off" | "no_record" | "incomplete" | "holiday";
@@ -109,21 +110,11 @@ export default function AdminRecordsPage() {
   return (
     <div className="recordsRoot">
       <div className="recordsShell">
-        <header className="recordsHeader">
-          <button
-            type="button"
-            className="recordsBackBtn"
-            onClick={() => nav(-1)}
-            aria-label={t("back") ?? "back"}
-          >
-            <span className="material-symbols-outlined">chevron_left</span>
-          </button>
-          <div className="recordsHeaderText">
-            <h1 className="recordsTitle">{t("records")}</h1>
-            <span className="recordsSubtitle">{t("admin_dashboard_staff_list")}</span>
-          </div>
-          <div className="recordsHeaderSpacer" />
-        </header>
+        <PageHeader
+          title={t("records")}
+          subtitle={t("admin_dashboard_staff_list")}
+          backAriaLabel={t("back") ?? "back"}
+        />
 
         <main className="recordsMain">
           <section aria-label="Summary Statistics">

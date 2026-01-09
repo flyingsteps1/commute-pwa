@@ -6,6 +6,7 @@ import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
 import AdminCalendarModal from "../components/admin/AdminCalendarModal";
 import AdminDayDetailModal from "../components/admin/AdminDayDetailModal";
+import PageHeader from "../components/PageHeader";
 import "./AdminDashboardPage.css";
 
 type TodayStatusCode = "working" | "break" | "off" | "no_record" | "incomplete" | "holiday";
@@ -107,28 +108,21 @@ export default function AdminDashboardPage() {
   return (
     <div key={lang} className="adminRoot">
       <div className="adminShell">
-        <header className="adminHeader">
-          <button
-            type="button"
-            className="iconCircle"
-            onClick={() => nav(-1)}
-            aria-label={t("back") ?? "back"}
-          >
-            <span className="material-symbols-outlined">arrow_back_ios_new</span>
-          </button>
-          <div className="headerTitles">
-            <h1 className="headerTitle">{t("admin_dashboard_title")}</h1>
-            <span className="headerSubtitle">{t("admin_dashboard_subtitle_today")}</span>
-          </div>
-          <button
-            type="button"
-            className="iconCircle calendarButton"
-            onClick={() => setCalendarOpen(true)}
-            aria-label={t("calendar") ?? "calendar"}
-          >
-            <span className="material-symbols-outlined">calendar_today</span>
-          </button>
-        </header>
+        <PageHeader
+          title={t("admin_dashboard_title")}
+          subtitle={t("admin_dashboard_subtitle_today")}
+          backAriaLabel={t("back") ?? "back"}
+          rightSlot={(
+            <button
+              type="button"
+              className="pageHeaderBtn pageHeaderBtnAccent"
+              onClick={() => setCalendarOpen(true)}
+              aria-label={t("calendar") ?? "calendar"}
+            >
+              <span className="material-symbols-outlined">calendar_today</span>
+            </button>
+          )}
+        />
 
         <main className="adminMain noScrollbar">
           <section aria-label="Summary Statistics" className="statsSection">

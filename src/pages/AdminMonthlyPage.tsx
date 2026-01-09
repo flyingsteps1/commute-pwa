@@ -7,6 +7,7 @@ import { listStaffPublic } from "../storage/staffRepo";
 import { listByMonth } from "../storage/todayRepo";
 import AdminCalendarModal from "../components/admin/AdminCalendarModal";
 import AdminMonthPickerModal from "../components/admin/AdminMonthPickerModal";
+import PageHeader from "../components/PageHeader";
 import "./AdminMonthlyPage.css";
 
 function currentMonthKey() {
@@ -227,17 +228,12 @@ export default function AdminMonthlyPage() {
   return (
     <div key={lang} className="monthlyRoot adminMonthly">
       <div className="monthlyShell">
-        <header className="monthlyHeader">
-          <div className="headerRow">
-            <button type="button" className="iconButton" onClick={() => nav(-1)} aria-label={t("back") ?? "back"}>
-              <span className="material-symbols-outlined">arrow_back_ios_new</span>
-            </button>
-            <div className="titleGroup">
-              <h1 className="pageTitle">{t("admin_monthly_title")}</h1>
-              <p className="pageSubtitle">{t("admin_monthly_desc")}</p>
-            </div>
-            <div className="headerSpacer" />
-          </div>
+        <div className="monthlyHeader">
+          <PageHeader
+            title={t("admin_monthly_title")}
+            subtitle={t("admin_monthly_desc")}
+            backAriaLabel={t("back") ?? "back"}
+          />
           <div className="monthNav" ref={monthNavRef}>
             <button
               type="button"
@@ -249,7 +245,7 @@ export default function AdminMonthlyPage() {
               <span className="material-symbols-outlined monthCenterIcon">expand_more</span>
             </button>
           </div>
-        </header>
+        </div>
 
         <main className="monthlyMain">
           {import.meta.env.DEV && devInfo && (

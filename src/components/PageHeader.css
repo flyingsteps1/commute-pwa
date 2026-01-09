@@ -1,0 +1,73 @@
+.pageHeader {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 8px;
+  background: rgba(246, 247, 251, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #dfe5ea;
+}
+
+.pageHeaderLeft,
+.pageHeaderRight {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.pageHeaderRight {
+  width: auto;
+  min-width: 40px;
+  justify-content: flex-end;
+}
+
+.pageHeaderCenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.pageHeaderTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.pageHeaderSubtitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8b97a3;
+}
+
+.pageHeaderBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #e6ebef;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(15, 25, 35, 0.1);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  color: #0c141d;
+}
+
+.pageHeaderBtn:active {
+  transform: scale(0.95);
+  background: #f1f5f9;
+}
+
+.pageHeaderBtnAccent {
+  color: #0a85ff;
+}
