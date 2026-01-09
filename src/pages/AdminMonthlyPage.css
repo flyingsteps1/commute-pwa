@@ -299,12 +299,15 @@
 
 .staffRow {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: none;
   background: transparent;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 6px;
   padding: 12px 14px;
   min-height: 72px;
   border-bottom: 1px solid #eef2f6;
@@ -322,11 +325,11 @@
 }
 
 .staffLeft {
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
-  flex: 1;
 }
 
 .staffAvatar {
@@ -372,25 +375,29 @@
 }
 
 .staffCenter {
+  grid-column: 1;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .staffRight {
-  margin-left: auto;
+  grid-column: 2;
+  grid-row: 1 / span 2;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
+  justify-self: end;
+  align-self: center;
 }
 
 .staffChips {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .staffCalBtn {
@@ -405,6 +412,7 @@
   justify-content: center;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .staffCalBtn:hover {
