@@ -481,6 +481,10 @@
   min-width: 44px;
 }
 
+.adminMonthly .chipLabelShort {
+  display: none;
+}
+
 @media (max-width: 390px) {
   .adminMonthly .staffChips .chip {
     padding: 5px 7px;
@@ -489,6 +493,12 @@
   .adminMonthly .staffChips .chipValue {
     font-size: 12px;
     line-height: 1.1;
+  }
+  .adminMonthly .chipLabelLong {
+    display: none;
+  }
+  .adminMonthly .chipLabelShort {
+    display: inline;
   }
 }
 

@@ -369,15 +369,18 @@ export default function AdminMonthlyPage() {
                       <div className="staffCenter">
                         <div className="staffChips">
                           <div className="chip chipInline chipWork">
-                            <span className="chipLabel chipInlineLabel">{t("admin_monthly_th_total")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelLong">{t("admin_monthly_th_total")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelShort">총근</span>
                             <span className="chipValue chipInlineValue">{minToHhmm(r.totalWorkMin)}</span>
                           </div>
                           <div className={`chip chipInline chipIncomplete ${incompleteMuted ? "chipMuted" : ""}`}>
-                            <span className="chipLabel chipInlineLabel">{t("admin_monthly_th_incomplete")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelLong">{t("admin_monthly_th_incomplete")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelShort">미완</span>
                             <span className="chipValue chipInlineValue">{r.incompleteDays}</span>
                           </div>
                           <div className={`chip chipInline chipHoliday ${holidayMuted ? "chipMuted" : ""}`}>
-                            <span className="chipLabel chipInlineLabel">{t("common_holiday")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelLong">{t("common_holiday")}</span>
+                            <span className="chipLabel chipInlineLabel chipLabelShort">휴무</span>
                             <span className="chipValue chipInlineValue">{r.holidayDays}</span>
                           </div>
                         </div>
