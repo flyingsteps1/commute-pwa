@@ -225,7 +225,7 @@ export default function AdminMonthlyPage() {
   const skeletonRows = Array.from({ length: 4 });
 
   return (
-    <div key={lang} className="monthlyRoot adminMonthly">
+    <div key={lang} className="monthlyRoot">
       <div className="monthlyShell">
         <header className="monthlyHeader">
           <div className="headerRow">

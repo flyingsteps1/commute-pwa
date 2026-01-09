@@ -297,7 +297,7 @@
   overflow: hidden;
 }
 
-.adminMonthly .staffRow {
+.staffRow {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -316,15 +316,15 @@
   transition: background 0.2s ease;
 }
 
-.adminMonthly .staffRow:last-child {
+.staffRow:last-child {
   border-bottom: none;
 }
 
-.adminMonthly .staffRow:hover {
+.staffRow:hover {
   background: #f9fbfc;
 }
 
-.adminMonthly .staffLeft {
+.staffLeft {
   grid-column: 1;
   display: flex;
   align-items: center;
@@ -332,7 +332,7 @@
   min-width: 0;
 }
 
-.adminMonthly .staffAvatar {
+.staffAvatar {
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -346,13 +346,13 @@
   flex-shrink: 0;
 }
 
-.adminMonthly .staffInfo {
+.staffInfo {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.adminMonthly .staffName {
+.staffName {
   font-size: 16px;
   font-weight: 800;
   color: #0c141d;
@@ -363,7 +363,7 @@
   text-overflow: ellipsis;
 }
 
-.adminMonthly .staffId {
+.staffId {
   font-size: 13px;
   font-weight: 600;
   color: #3b82f6;
@@ -374,15 +374,14 @@
   text-overflow: ellipsis;
 }
 
-.adminMonthly .staffCenter {
+.staffCenter {
   grid-column: 1;
   display: flex;
   align-items: center;
   min-width: 0;
-  flex-wrap: nowrap;
 }
 
-.adminMonthly .staffRight {
+.staffRight {
   grid-column: 2;
   grid-row: 1 / span 2;
   display: flex;
@@ -390,20 +389,18 @@
   justify-content: flex-end;
   flex-shrink: 0;
   justify-self: end;
-  align-self: start;
+  align-self: center;
 }
 
-.adminMonthly .staffChips {
+.staffChips {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   min-width: 0;
-  flex: 1 1 auto;
-  overflow: hidden;
 }
 
-.adminMonthly .staffCalBtn {
+.staffCalBtn {
   width: 36px;
   height: 36px;
   border-radius: 999px;
@@ -451,11 +448,6 @@
   color: #64748b;
   line-height: 14px;
   white-space: nowrap;
-}
-
-.adminMonthly .staffChips .chip {
-  flex: 1 1 0;
-  min-width: 0;
 }
 
 .chipValue {
