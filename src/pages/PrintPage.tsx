@@ -403,7 +403,7 @@ export default function PrintPage() {
   const employeeLine = queryEmployee ? t.employee(staffName ?? queryEmployee) : null;
 
   return (
-    <div style={{ background: "#fff", color: "#111" }}>
+    <div className="printPage" style={{ background: "#fff", color: "#111" }}>
       <style>{`
         /* ===== screen styles (keep as-is) ===== */
         .printRoot{
@@ -445,6 +445,12 @@ export default function PrintPage() {
           gap: 10px;
           margin-bottom: 10px;
         }
+        .headRight{
+          display:flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 4px;
+        }
         .title{
           margin: 0;
           font-size: 18px;
@@ -458,25 +464,49 @@ export default function PrintPage() {
           border: 1px solid #bfdbfe;
           font-weight: 800;
         }
-        .summary{
+        .printPage .versionStamp{
+          font-size: 10px;
+          color: #94a3b8;
+          font-weight: 700;
+        }
+        .printPage .kpiGrid{
           display:grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 6px 10px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 8px 10px;
           margin: 0 0 10px 0;
           border: 1px solid #d1d5db;
           border-radius: 10px;
           padding: 8px 10px;
           font-size: 12px;
+          align-items: stretch;
+          min-width: 0;
         }
-        .sumItem{
+        .printPage .kpiItem{
           display:flex;
-          align-items:center;
+          align-items: baseline;
           justify-content:space-between;
           gap: 8px;
           white-space: nowrap;
+          min-width: 0;
+          padding: 8px 10px;
+          border-radius: 10px;
         }
-        .sumLabel{ color: #4b5563; font-weight: 700; }
-        .sumVal{ font-weight: 900; color: #111827; }
+        .printPage .kpiLabel{
+          color: #4b5563;
+          font-weight: 700;
+          min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 12px;
+          opacity: 0.75;
+        }
+        .printPage .kpiValue{
+          font-weight: 900;
+          color: #111827;
+          flex-shrink: 0;
+          white-space: nowrap;
+        }
 
         table{
           width: 100%;
@@ -499,6 +529,13 @@ export default function PrintPage() {
         .left{ text-align:left; }
         .muted{ color: #9ca3af; }
         .warn{ color: #d97706; font-weight: 800; }
+
+        @media (max-width: 420px) {
+          .printPage .kpiGrid{
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+          }
+        }
 
         @media print {
           @page { size: A4 portrait; margin: 0; }
@@ -546,16 +583,16 @@ export default function PrintPage() {
             font-size: 10px !important;
           }
 
-          .summary{
-            grid-template-columns: 1fr 1fr !important;
-            gap: 2mm !important;
+          .printPage .kpiGrid{
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 2mm 3mm !important;
             margin: 2mm 0 2mm 0 !important;
             padding: 2mm !important;
             border-radius: 0 !important;
             font-size: 10px !important;
           }
-          .sumLabel{ font-size: 9px !important; }
-          .sumVal{ font-size: 10px !important; }
+          .printPage .kpiLabel{ font-size: 9px !important; }
+          .printPage .kpiValue{ font-size: 10px !important; }
 
           table{
             font-size: 9px !important;
@@ -568,7 +605,7 @@ export default function PrintPage() {
             white-space: nowrap !important;
           }
 
-          .head, .summary, table { page-break-inside: avoid !important; }
+          .head, .kpiGrid, table { page-break-inside: avoid !important; }
         }
       `}</style>
 
@@ -604,35 +641,38 @@ export default function PrintPage() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>{employeeLine}</div>
               )}
             </div>
-            <div className="monthBadge">{monthTitle}</div>
+            <div className="headRight">
+              <div className="monthBadge">{monthTitle}</div>
+              <div className="versionStamp">PRINT_KPI_VER_20260109_01</div>
+            </div>
           </div>
 
-          <div className="summary">
-            <div className="sumItem">
-              <span className="sumLabel">{t.totalWork}</span>
-              <span className="sumVal">{minToHhmm(model.summary.totalWorkMin)}</span>
+          <div className="summary kpiGrid">
+            <div className="sumItem kpiItem">
+              <span className="sumLabel kpiLabel">{t.totalWork}</span>
+              <span className="sumVal kpiValue">{minToHhmm(model.summary.totalWorkMin)}</span>
             </div>
-            <div className="sumItem">
-              <span className="sumLabel">{t.totalBreak}</span>
-              <span className="sumVal">{minToHhmm(model.summary.totalBreakMin)}</span>
+            <div className="sumItem kpiItem">
+              <span className="sumLabel kpiLabel">{t.totalBreak}</span>
+              <span className="sumVal kpiValue">{minToHhmm(model.summary.totalBreakMin)}</span>
             </div>
-            <div className="sumItem">
-              <span className="sumLabel">{t.workDays}</span>
-              <span className="sumVal">
+            <div className="sumItem kpiItem">
+              <span className="sumLabel kpiLabel">{t.workDays}</span>
+              <span className="sumVal kpiValue">
                 {model.summary.workDays}
                 {t.dayUnit}
               </span>
             </div>
-            <div className="sumItem">
-              <span className="sumLabel">{t.incomplete}</span>
-              <span className="sumVal">
+            <div className="sumItem kpiItem">
+              <span className="sumLabel kpiLabel">{t.incomplete}</span>
+              <span className="sumVal kpiValue">
                 {model.summary.incompleteDays}
                 {t.dayUnit}
               </span>
             </div>
-            <div className="sumItem">
-              <span className="sumLabel">{t.off}</span>
-              <span className="sumVal">
+            <div className="sumItem kpiItem">
+              <span className="sumLabel kpiLabel">{t.off}</span>
+              <span className="sumVal kpiValue">
                 {model.summary.offDays}
                 {t.dayUnit}
               </span>
