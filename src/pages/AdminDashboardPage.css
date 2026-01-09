@@ -1,0 +1,342 @@
+.adminRoot {
+  min-height: max(884px, 100dvh);
+  background: #f5f7f8;
+  color: #0c141d;
+}
+
+.adminShell {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7f8;
+}
+
+.adminHeader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(245, 247, 248, 0.95);
+  border-bottom: 1px solid #e6ebef;
+  backdrop-filter: blur(12px);
+}
+
+.iconCircle {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c8794;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.iconCircle:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.calendarButton {
+  color: #0a85ff;
+}
+
+.headerTitles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 2px;
+}
+
+.headerTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.headerSubtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.adminMain {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: 40px;
+  overflow-y: auto;
+}
+
+.noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.noScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.statsSection {
+  margin-bottom: 28px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.listSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.listTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.listCard {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.staffRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid #eef2f6;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.staffRow:last-child {
+  border-bottom: none;
+}
+
+.staffRow:hover {
+  background: #f9fbfc;
+}
+
+.staffRow:active {
+  background: #f1f5f9;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(10, 133, 255, 0.1);
+  color: #0a85ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.staffInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.staffName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c141d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.staffMeta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #8b97a3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rowDetail {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa5b1;
+  white-space: nowrap;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.statusWorking {
+  color: #0a85ff;
+  background: rgba(10, 133, 255, 0.12);
+}
+
+.statusBreak {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.statusOff {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.15);
+}
+
+.statusHoliday {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.statusNoRecord {
+  color: #6b7280;
+  background: #f1f5f9;
+}
+
+.statusIncomplete {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.emptyState {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #8b97a3;
+}
+
+.errorText {
+  padding: 10px 16px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.skeletonCard {
+  pointer-events: none;
+}
+
+.skeletonRow {
+  pointer-events: none;
+}
+
+.skeletonBlock {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonNumber {
+  width: 28px;
+  height: 20px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+}
+
+.skeletonLabel {
+  width: 36px;
+  height: 10px;
+  border-radius: 6px;
+}
+
+.skeletonAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonName {
+  width: 120px;
+  height: 14px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.skeletonMeta {
+  width: 80px;
+  height: 10px;
+  border-radius: 6px;
+}
+
+.skeletonPill {
+  width: 56px;
+  height: 18px;
+  border-radius: 999px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}

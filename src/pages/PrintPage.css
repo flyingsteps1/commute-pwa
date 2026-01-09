@@ -1,0 +1,296 @@
+.printPage {
+  min-height: 100vh;
+  background: #f6f7fb;
+  color: #0e121b;
+  padding: 14px;
+  box-sizing: border-box;
+  font-family: "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.printToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.printToolbarTitle {
+  flex: 1;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.printToolbarTitleMain {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.printToolbarTitleSub {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.printBtn {
+  border: 1px solid #e6ebef;
+  background: #fff;
+  color: #0e121b;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 32px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.printBtnPrimary {
+  border-color: #2466eb;
+  color: #2466eb;
+  background: rgba(36, 102, 235, 0.08);
+}
+
+.printPreview {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(15, 25, 35, 0.08);
+  overflow: auto;
+}
+
+.printSheet {
+  --print-zoom: 1;
+  width: 297mm;
+  height: 210mm;
+  background: #fff;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 6mm;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.printHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.printTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.printMeta {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.printMetaDot {
+  color: #94a3b8;
+  font-weight: 900;
+}
+
+.printMonthBadge {
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #e5f2ff;
+  border: 1px solid #bfdbfe;
+  font-weight: 900;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.printSummary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px 8px;
+  margin: 0 0 6px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.sumItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.sumLabel {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.sumVal {
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.printTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10px;
+}
+
+.printTable th,
+.printTable td {
+  border: 1px solid #e5e7eb;
+  padding: 2px 3px;
+  height: 16px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.printTable thead th {
+  background: #f1f5f9;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.left {
+  text-align: left;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.warn {
+  color: #d97706;
+  font-weight: 900;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined" !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  .noPrint,
+  .no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .printPage {
+    padding: 0 !important;
+    background: #fff !important;
+    min-height: auto !important;
+  }
+
+  .printPreview {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    overflow: hidden !important;
+  }
+
+  .printSheet {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .printSheet {
+    zoom: var(--print-zoom);
+  }
+
+  .printTitle {
+    font-size: 11px !important;
+  }
+
+  .printMeta {
+    font-size: 9px !important;
+    gap: 4px !important;
+  }
+
+  .printMonthBadge {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+    border-radius: 0 !important;
+  }
+
+  .printSummary {
+    padding: 4px 6px !important;
+    gap: 3px 6px !important;
+    margin-bottom: 5px !important;
+    border-radius: 0 !important;
+  }
+
+  .sumLabel {
+    font-size: 8px !important;
+  }
+
+  .sumVal {
+    font-size: 9px !important;
+  }
+
+  .printTable {
+    font-size: 8.5px !important;
+  }
+
+  .printTable th,
+  .printTable td {
+    padding: 1px 2px !important;
+    height: 14px !important;
+    line-height: 1.1 !important;
+  }
+}

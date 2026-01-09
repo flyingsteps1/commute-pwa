@@ -1,0 +1,399 @@
+.monthlyRoot {
+  min-height: max(884px, 100dvh);
+  background: #f6f7fb;
+  color: #0c141d;
+}
+
+.monthlyShell {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #f6f7fb;
+}
+
+.monthlyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(245, 247, 248, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e6ebef;
+  padding: 16px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleGroup {
+  flex: 1;
+  text-align: left;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.pdfButton {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #dbe3ea;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a85ff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.pdfButton:hover {
+  background: #f1f5f9;
+}
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.monthCenterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.monthCenterBtn:hover {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.monthCenterText {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0c141d;
+}
+
+.monthCenterIcon {
+  font-size: 20px;
+  color: #8b97a3;
+}
+
+.monthlyMain {
+  flex: 1;
+  padding: 20px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summaryCard {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summaryTile {
+  min-height: 90px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.summaryWide {
+  grid-column: span 2;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 18px;
+  min-height: 64px;
+}
+
+.summaryValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.summaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.summaryTintIncomplete {
+  background: #fff5f5;
+  border-color: #ffe2e5;
+}
+
+.summaryTintIncomplete .summaryValue,
+.summaryTintIncomplete .summaryLabel {
+  color: #ef4444;
+}
+
+.summaryTintHoliday {
+  background: #ffecef;
+  border-color: #ffd2d8;
+}
+
+.summaryTintHoliday .summaryValue,
+.summaryTintHoliday .summaryLabel {
+  color: #ef4444;
+}
+
+.summaryTintPositive {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.18);
+}
+
+.summaryTintPositive .summaryValue,
+.summaryTintPositive .summaryLabel {
+  color: #16a34a;
+}
+
+.monthlyWarn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.monthlyWarnTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.monthlyWarnSub {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.monthlyWarnIcon {
+  color: #94a3b8;
+  font-size: 20px;
+}
+
+.errorState {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.monthPickerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24px 16px 40px;
+}
+
+.monthPickerModal {
+  width: min(360px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e6ebef;
+  box-shadow: 0 10px 30px rgba(15, 25, 35, 0.12);
+  padding: 16px;
+}
+
+.monthPickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.monthPickerTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.monthPickerClose {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #eef2f6;
+  background: #ffffff;
+  color: #8b97a3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.monthPickerYear {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.yearNavBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #e6ebef;
+  background: #ffffff;
+  color: #8b97a3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.yearLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.monthChip {
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #e6ebef;
+  background: #ffffff;
+  color: #0c141d;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.monthChip:active {
+  transform: scale(0.98);
+}
+
+.monthChip:focus-visible {
+  outline: 2px solid rgba(36, 102, 235, 0.55);
+  outline-offset: 2px;
+}
+
+.monthChip.selected {
+  background: #2466eb;
+  border-color: #2466eb;
+  color: #ffffff;
+}
+
+.summarySkeleton,
+.skeletonRow {
+  pointer-events: none;
+}
+
+.skeletonBlock {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonValue {
+  width: 56px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.skeletonLabel {
+  width: 48px;
+  height: 10px;
+  border-radius: 8px;
+}
+
+.skeletonCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonName {
+  width: 110px;
+  height: 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.skeletonMeta {
+  width: 70px;
+  height: 10px;
+  border-radius: 6px;
+}
+
+.skeletonChip {
+  width: 52px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}

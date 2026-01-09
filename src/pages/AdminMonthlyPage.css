@@ -1,0 +1,610 @@
+.monthlyRoot {
+  min-height: max(884px, 100dvh);
+  background: #f5f7f8;
+  color: #0c141d;
+}
+
+.monthlyShell {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7f8;
+}
+
+.monthlyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(245, 247, 248, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e6ebef;
+  padding: 16px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.iconButton:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #0a85ff;
+}
+
+.titleGroup {
+  flex: 1;
+  text-align: center;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.headerSpacer {
+  width: 40px;
+}
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 14px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+/* Hide DEV-only debug panel under month nav */
+.monthNavDevDebug {
+  display: none !important;
+}
+
+.monthCenterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.monthCenterBtn:hover {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.monthCenterText {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0c141d;
+}
+
+.monthCenterIcon {
+  font-size: 20px;
+  color: #8b97a3;
+}
+
+.monthHiddenInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.monthHiddenInput::-webkit-clear-button,
+.monthHiddenInput::-webkit-inner-spin-button,
+.monthHiddenInput::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.monthHiddenInput {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.monthlyMain {
+  flex: 1;
+  padding: 20px 18px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.devPanel {
+  border: 1px dashed #cbd5f5;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.devRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.devBlock {
+  align-items: flex-start;
+}
+
+.devLabel {
+  font-weight: 700;
+  color: #64748b;
+}
+
+.devValue {
+  font-weight: 600;
+  color: #0c141d;
+}
+
+.devList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.monthNavDebug,
+.monthNav-debug,
+.monthNavCandidates {
+  display: none !important;
+}
+
+.summaryCard {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summaryTile {
+  min-height: 90px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.summaryWide {
+  grid-column: span 2;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 18px;
+  min-height: 64px;
+}
+
+.summaryValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.summaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b97a3;
+}
+
+.summaryTintIncomplete {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.18);
+}
+
+.summaryTintIncomplete .summaryValue,
+.summaryTintIncomplete .summaryLabel {
+  color: #f97316;
+}
+
+.summaryTintHoliday {
+  background: rgba(227, 93, 91, 0.1);
+  border-color: rgba(227, 93, 91, 0.2);
+}
+
+.summaryTintHoliday .summaryValue,
+.summaryTintHoliday .summaryLabel {
+  color: #e35d5b;
+}
+
+.staffSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.staffHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.staffTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.staffCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #eef2f6;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.staffCard {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.staffRow {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: 72px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.staffRow:last-child {
+  border-bottom: none;
+}
+
+.staffRow:hover {
+  background: #f9fbfc;
+}
+
+.staffLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.staffAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(10, 133, 255, 0.12);
+  color: #0a85ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.staffInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.staffName {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0c141d;
+  line-height: 18px;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.staffId {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b82f6;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.staffCenter {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.staffRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.staffChips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.staffCalBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.staffCalBtn:hover {
+  background: rgba(10, 133, 255, 0.1);
+  color: #0a85ff;
+  border-color: rgba(10, 133, 255, 0.4);
+}
+
+.staffCalBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.chip {
+  min-width: 72px;
+  height: 30px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.chipLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.chipValue {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 14px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.chipInline {
+  min-width: 76px;
+}
+
+.chipInlineLabel,
+.chipInlineValue {
+  display: inline-flex;
+}
+
+.miniChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  min-width: 72px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.miniChipLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+  line-height: 14px;
+}
+
+.miniChipValue {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chipIncomplete {
+  background: #fff3e8;
+  border-color: #ffe0c4;
+}
+
+.chipIncomplete .chipLabel,
+.chipIncomplete .chipValue,
+.chipIncomplete .miniChipLabel,
+.chipIncomplete .miniChipValue {
+  color: #f97316;
+}
+
+.chipHoliday {
+  background: #ffecef;
+  border-color: #ffd2d8;
+}
+
+.chipHoliday .chipLabel,
+.chipHoliday .chipValue,
+.chipHoliday .miniChipLabel,
+.chipHoliday .miniChipValue {
+  color: #e35d5b;
+}
+
+.chipMuted {
+  opacity: 0.6;
+}
+
+.emptyState {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.errorState {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.summarySkeleton,
+.skeletonRow {
+  pointer-events: none;
+}
+
+.skeletonBlock {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonValue {
+  width: 56px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.skeletonLabel {
+  width: 48px;
+  height: 10px;
+  border-radius: 8px;
+}
+
+.skeletonCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e7edf3 0%, #f2f6fa 50%, #e7edf3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeletonName {
+  width: 110px;
+  height: 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.skeletonMeta {
+  width: 70px;
+  height: 10px;
+  border-radius: 6px;
+}
+
+.skeletonChip {
+  width: 52px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+input[type="month"]::-webkit-clear-button,
+input[type="month"]::-webkit-inner-spin-button,
+input[type="month"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none !important;
+}
+
+input[type="month"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: none !important;
+}

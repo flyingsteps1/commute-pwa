@@ -1,0 +1,1579 @@
+--- a/src/i18n/I18nProvider.tsx
++++ b/src/i18n/I18nProvider.tsx
+@@ -0,0 +1,228 @@
++﻿import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
++import { STRINGS, type Lang, type LangKey } from "./strings";
++
++const LANG_STORAGE_KEY = "app_lang";
++
++function normalizeLang(value: string | null): Lang {
++  return value === "ja" ? "ja" : "ko";
++}
++
++type I18nValue = {
++  lang: Lang;
++  setLang: (lang: Lang) => void;
++  toggleLang: () => void;
++  t: (key: LangKey | string) => string;
++};
++
++export const I18nContext = createContext<I18nValue>({
++  lang: "ko",
++  setLang: () => {},
++  toggleLang: () => {},
++  t: (key) => String(key),
++});
++
++export function I18nProvider({ children }: { children: ReactNode }) {
++  const [lang, setLangState] = useState<Lang>(() => normalizeLang(localStorage.getItem(LANG_STORAGE_KEY)));
++
++  const EXTRA = useMemo(
++    () => ({
++      ko: {
++        calendar_title: "달력",
++        calendar_prev_month: "이전 달",
++        calendar_next_month: "다음 달",
++        calendar_status_none: "기록 없음",
++        calendar_sheet_edit: "수정하기",
++        calendar_sheet_close: "닫기",
++        calendar: "달력",
++        admin_dashboard_title: "직원 근무 현황",
++        admin_dashboard_subtitle_today: "오늘의 상태",
++        admin_dashboard_staff_list: "직원 목록",
++        admin_monthly_title: "월별",
++        admin_monthly_desc: "직원별 월간 요약",
++        admin_monthly_prev_month: "이전 달",
++        admin_monthly_next_month: "다음 달",
++        admin_monthly_staff_list: "직원 목록",
++        admin_monthly_th_staff: "직원",
++        admin_monthly_th_days: "근무일",
++        admin_monthly_th_total: "총근무",
++        admin_monthly_th_incomplete: "미완료",
++        admin_monthly_empty_staff: "직원이 없습니다.",
++        admin_staff_detail_title: "직원 상세",
++        admin_staff_detail_prev_month: "이전 달",
++        admin_staff_detail_next_month: "다음 달",
++        admin_staff_detail_summary_total_work: "총 근무시간",
++        admin_staff_detail_summary_days: "근무일수",
++        admin_staff_detail_summary_incomplete: "미완료",
++        admin_staff_detail_empty: "기록이 없습니다.",
++        admin_staff_detail_th_date: "날짜",
++        admin_staff_detail_th_check_in: "출근",
++        admin_staff_detail_th_check_out: "퇴근",
++        admin_staff_detail_th_break: "휴게",
++        admin_staff_detail_th_work: "근무",
++        staff_monthly_title: "월요약",
++        staff_monthly_total_work: "총 근무시간",
++        staff_monthly_total_break: "총 휴게시간",
++        staff_monthly_days: "근무일 수",
++        staff_monthly_incomplete: "미완료",
++        staff_monthly_incomplete_hint: "(출/퇴 누락)",
++        staff_monthly_pdf: "PDF 출력",
++        staff_monthly_warn_title: "기록 정리가 필요해요",
++        staff_monthly_warn_sub: "미완료된 근무 기록이 {count}건 있습니다.",
++        today_sum_work: "총 근무시간",
++        today_sum_break: "휴게시간",
++        common_working: "근무중",
++        common_break: "휴식중",
++        common_off: "퇴근",
++        common_no_record: "기록없음",
++        common_incomplete: "미완료",
++        common_check_in: "출근",
++        common_check_out: "퇴근",
++        common_break_start: "휴식 시작",
++        common_holiday: "휴무",
++        common_holiday_cancel: "휴무 취소",
++        common_dash: "—",
++        common_loading: "로딩 중...",
++        common_staff: "직원",
++        print_incomplete: "미완료",
++        print_holiday: "휴무",
++        print_holiday_days: "휴무",
++        print_work: "근무",
++        print_break: "휴게",
++        print_overtime: "연장",
++        print_early_leave: "조퇴",
++        print_date: "날짜",
++        print_check_in: "출근",
++        print_check_out: "퇴근",
++        print_total_work: "총 근무시간",
++        print_total_break: "총 휴게시간",
++        print_workdays: "근무일수",
++        print_title: "출퇴근 기록표",
++        print_monthly_title: "월별 기록표",
++        print_button: "인쇄 / PDF 출력",
++        print_no_info: "정보가 없습니다",
++        print_invalid_month: "month=YYYY-MM 형식으로 입력하세요",
++        print_loading: "Loading...",
++        records_filter_all: "전체",
++        records_filter_work: "근무",
++        records_filter_incomplete: "미완료",
++        records_filter_holiday: "휴무",
++      },
++      ja: {
++        calendar_title: "カレンダー",
++        calendar_prev_month: "前の月",
++        calendar_next_month: "次の月",
++        calendar_status_none: "記録なし",
++        calendar_sheet_edit: "編集する",
++        calendar_sheet_close: "閉じる",
++        calendar: "カレンダー",
++        admin_dashboard_title: "スタッフ勤務状況",
++        admin_dashboard_subtitle_today: "今日の状態",
++        admin_dashboard_staff_list: "スタッフ一覧",
++        admin_monthly_title: "月別",
++        admin_monthly_desc: "スタッフ別の月次サマリー",
++        admin_monthly_prev_month: "前の月",
++        admin_monthly_next_month: "次の月",
++        admin_monthly_staff_list: "スタッフ一覧",
++        admin_monthly_th_staff: "スタッフ",
++        admin_monthly_th_days: "勤務日",
++        admin_monthly_th_total: "総勤務",
++        admin_monthly_th_incomplete: "未完了",
++        admin_monthly_empty_staff: "スタッフがいません。",
++        admin_staff_detail_title: "スタッフ詳細",
++        admin_staff_detail_prev_month: "前の月",
++        admin_staff_detail_next_month: "次の月",
++        admin_staff_detail_summary_total_work: "総勤務時間",
++        admin_staff_detail_summary_days: "勤務日数",
++        admin_staff_detail_summary_incomplete: "未完了",
++        admin_staff_detail_empty: "記録がありません。",
++        admin_staff_detail_th_date: "日付",
++        admin_staff_detail_th_check_in: "出勤",
++        admin_staff_detail_th_check_out: "退勤",
++        admin_staff_detail_th_break: "休憩",
++        admin_staff_detail_th_work: "勤務",
++        staff_monthly_title: "月別",
++        staff_monthly_total_work: "総勤務時間",
++        staff_monthly_total_break: "総休憩時間",
++        staff_monthly_days: "勤務日数",
++        staff_monthly_incomplete: "未完了",
++        staff_monthly_incomplete_hint: "(出/退勤漏れ)",
++        staff_monthly_pdf: "PDF出力",
++        staff_monthly_warn_title: "記録の確認が必要です",
++        staff_monthly_warn_sub: "未完了の勤務記録が {count} 件あります。",
++        today_sum_work: "総勤務時間",
++        today_sum_break: "休憩時間",
++        common_working: "勤務中",
++        common_break: "休憩中",
++        common_off: "退勤",
++        common_no_record: "記録なし",
++        common_incomplete: "未完了",
++        common_check_in: "出勤",
++        common_check_out: "退勤",
++        common_break_start: "休憩開始",
++        common_holiday: "休み",
++        common_holiday_cancel: "休み取消",
++        common_dash: "—",
++        common_loading: "読み込み中...",
++        common_staff: "スタッフ",
++        print_incomplete: "未完了",
++        print_holiday: "休み",
++        print_holiday_days: "休み",
++        print_work: "勤務",
++        print_break: "休憩",
++        print_overtime: "残業",
++        print_early_leave: "早退",
++        print_date: "日付",
++        print_check_in: "出勤",
++        print_check_out: "退勤",
++        print_total_work: "総勤務時間",
++        print_total_break: "総休憩時間",
++        print_workdays: "勤務日数",
++        print_title: "出退勤記録表",
++        print_monthly_title: "月別記録表",
++        print_button: "印刷 / PDF 出力",
++        print_no_info: "情報がありません",
++        print_invalid_month: "month=YYYY-MM 形式で入力してください",
++        print_loading: "Loading...",
++        records_filter_all: "全体",
++        records_filter_work: "勤務",
++        records_filter_incomplete: "未完了",
++        records_filter_holiday: "休み",
++      },
++    }),
++    []
++  );
++
++  const setLang = (next: Lang) => {
++    setLangState((prev) => {
++      const normalized = normalizeLang(next);
++      localStorage.setItem(LANG_STORAGE_KEY, normalized);
++      if (import.meta.env.DEV && prev !== normalized) console.log(`[i18n] lang changed: ${prev} -> ${normalized}`);
++      return normalized;
++    });
++  };
++
++  const toggleLang = () => setLang(lang === "ko" ? "ja" : "ko");
++
++  const t = (key: LangKey | string) => {
++    const table = STRINGS[lang];
++    const value = (EXTRA as any)?.[lang]?.[key] ?? (table as any)?.[key];
++    if (value !== undefined) return value;
++    const fallback = (EXTRA as any)?.ko?.[key] ?? (STRINGS.ko as any)?.[key];
++    if (fallback !== undefined) {
++      if (import.meta.env.DEV) console.warn(`[i18n] missing key in ${lang}: ${String(key)}, using ko fallback`);
++      return fallback;
++    }
++    if (import.meta.env.DEV) console.warn(`[i18n] missing key: ${String(key)}`);
++    return String(key);
++  };
++
++  const value = useMemo<I18nValue>(() => ({ lang, setLang, toggleLang, t }), [lang]);
++
++  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
++}
++
++export function useI18n() {
++  return useContext(I18nContext);
++}
++
++export type { Lang, LangKey };
+
+--- a/src/pages/LoginPage.tsx
++++ b/src/pages/LoginPage.tsx
+@@ -0,0 +1,248 @@
++﻿import { useEffect, useRef, useState } from "react";
++import { useLocation, useNavigate } from "react-router-dom";
++import { setSession } from "../auth/session";
++import { useI18n } from "../i18n/I18nProvider";
++import { listStaffPublic } from "../storage/staffRepo";
++import { signInAdmin, signInStaff } from "../storage/authApi";
++import type { StaffPublic } from "../storage/staffRepo";
++
++type Role = "admin" | "staff";
++
++export default function LoginPage() {
++  const nav = useNavigate();
++  const loc = useLocation();
++
++  const [role, setRole] = useState<Role>("admin");
++  const [password, setPassword] = useState("");
++  const [selectedStaffId, setSelectedStaffId] = useState("");
++  const [showPassword, setShowPassword] = useState(false);
++  const [error, setError] = useState("");
++  const [staffError, setStaffError] = useState("");
++  const [staffList, setStaffList] = useState<StaffPublic[]>([]);
++  const [loadingStaff, setLoadingStaff] = useState(false);
++  const [submitting, setSubmitting] = useState(false);
++  const { lang, setLang, t } = useI18n();
++  const loadedRef = useRef(false);
++
++  console.log("[LoginPage] render", Date.now());
++
++  useEffect(() => {
++    loadedRef.current = false;
++  }, [lang]);
++
++  useEffect(() => {
++    if (loadedRef.current) return;
++    loadedRef.current = true;
++    console.log("[LoginPage] staff effect fired", Date.now(), "lang=", lang);
++    let cancelled = false;
++    async function loadStaff() {
++      setLoadingStaff(true);
++      setStaffError("");
++      try {
++        const staff = await listStaffPublic();
++        if (!cancelled) setStaffList(staff);
++      } catch (err) {
++        console.error(err);
++        if (!cancelled) setStaffError((err as Error)?.message || "Failed to load staff list.");
++      } finally {
++        if (!cancelled) setLoadingStaff(false);
++      }
++    }
++    loadStaff();
++    return () => {
++      cancelled = true;
++    };
++  }, [lang]);
++
++  const from = (loc.state as any)?.from as string | undefined;
++
++  async function handleSubmit(e: React.FormEvent) {
++    e.preventDefault();
++    setError("");
++
++    if (!password.trim()) {
++      setError(t("login_password_placeholder"));
++      return;
++    }
++    if (role === "staff" && !selectedStaffId) {
++      setError(t("login_staff_select_placeholder"));
++      return;
++    }
++
++    setSubmitting(true);
++    try {
++      if (role === "admin") {
++        const profile = await signInAdmin(password);
++        setSession({ role: "admin", staffName: profile.display_name, loggedInAt: Date.now() });
++        nav("/admin", { replace: true });
++        return;
++      }
++
++      const profile = await signInStaff(selectedStaffId, password);
++      setSession({
++        role: "staff",
++        staffId: profile.staff_id ?? selectedStaffId,
++        staffName: profile.display_name,
++        loggedInAt: Date.now(),
++      });
++      nav(from || "/", { replace: true });
++    } catch (err: any) {
++      console.error(err);
++      setError(err?.message || t("login_password_placeholder"));
++    } finally {
++      setSubmitting(false);
++    }
++  }
++
++  const isStaff = role === "staff";
++
++  return (
++    <div className="bg-background-light dark:bg-background-dark text-[#0c0c1d] dark:text-white antialiased min-h-screen">
++      <div className="relative flex min-h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl bg-white dark:bg-[#1a1a2e]">
++        <div className="flex flex-col items-center pt-16 pb-8 px-6">
++          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
++            <span className="material-symbols-outlined text-primary text-5xl">schedule</span>
++          </div>
++          <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", maxWidth: 360, justifyContent: "space-between" }}>
++            <h1 className="text-3xl font-bold tracking-tight text-center text-slate-900 dark:text-white" style={{ margin: 0 }}>
++              {t("app_title")}
++            </h1>
++            <div style={{ display: "flex", gap: 6 }}>
++              <button
++                type="button"
++                onClick={() => setLang("ko")}
++                style={{
++                  fontSize: 12,
++                  border: "1px solid #cbd5e1",
++                  borderRadius: 12,
++                  padding: "6px 10px",
++                  background: lang === "ko" ? "#0ea5e9" : "#f8fafc",
++                  color: lang === "ko" ? "#fff" : "#0f172a",
++                  cursor: "pointer",
++                }}
++              >???</button>
++              <button
++                type="button"
++                onClick={() => setLang("ja")}
++                style={{
++                  fontSize: 12,
++                  border: "1px solid #cbd5e1",
++                  borderRadius: 12,
++                  padding: "6px 10px",
++                  background: lang === "ja" ? "#0ea5e9" : "#f8fafc",
++                  color: lang === "ja" ? "#fff" : "#0f172a",
++                  cursor: "pointer",
++                }}
++              >???</button>
++            </div>
++          </div>
++          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t("app_desc")}</p>
++        </div>
++
++        <div className="flex-1 flex flex-col px-6 gap-6">
++          <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex">
++            <label className="flex-1 cursor-pointer">
++              <input className="peer sr-only" name="login_type" type="radio" value="admin" checked={role === "admin"} onChange={() => setRole("admin")} />
++              <div className="py-2.5 text-center text-sm font-medium text-slate-500 rounded-lg transition-all peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm dark:peer-checked:bg-slate-700 dark:peer-checked:text-white dark:text-slate-400">
++                {t("login_admin")}
++              </div>
++            </label>
++
++            <label className="flex-1 cursor-pointer">
++              <input className="peer sr-only" name="login_type" type="radio" value="staff" checked={role === "staff"} onChange={() => setRole("staff")} />
++              <div className="py-2.5 text-center text-sm font-medium text-slate-500 rounded-lg transition-all peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm dark:peer-checked:bg-slate-700 dark:peer-checked:text-white dark:text-slate-400">
++                {t("login_staff")}
++              </div>
++            </label>
++          </div>
++
++          <form className="flex flex-col gap-5 mt-2" onSubmit={handleSubmit}>
++            {isStaff && (
++              <div className="flex flex-col gap-2">
++                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("login_staff_select_label")}</label>
++                <div className="flex flex-wrap gap-2">
++                  {loadingStaff ? (
++                    <p className="text-sm text-slate-500 dark:text-slate-400">Loading staff...</p>
++                  ) : (
++                    staffList.map((s) => (
++                      <button
++                        key={s.staffId}
++                        type="button"
++                        onClick={() => setSelectedStaffId(s.staffId)}
++                        className={`px-3 py-2 rounded-lg border text-sm font-medium transition ${
++                          selectedStaffId === s.staffId
++                            ? "bg-primary text-white border-primary shadow-sm"
++                            : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
++                        }`}
++                      >
++                        {s.name ?? s.displayName ?? s.staffId}
++                      </button>
++                    ))
++                  )}
++                </div>
++                {!loadingStaff && staffList.length === 0 && !staffError && (
++                  <p className="text-xs text-slate-500 dark:text-slate-400">{t("login_staff_select_placeholder")}</p>
++                )}
++                {staffError && <p className="text-xs text-red-500 dark:text-red-400">{staffError}</p>}
++              </div>
++            )}
++
++            <div className="flex flex-col gap-2">
++              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("login_password_label")}</label>
++              <div className="relative group">
++                <input
++                  className="w-full h-14 pl-4 pr-12 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-base text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400"
++                  placeholder={t("login_password_placeholder")}
++                  type={showPassword ? "text" : "password"}
++                  value={password}
++                  onChange={(e) => setPassword(e.target.value)}
++                  disabled={submitting}
++                />
++                <button
++                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
++                  type="button"
++                  onClick={() => setShowPassword((v) => !v)}
++                  aria-label="toggle-password"
++                >
++                  <span className="material-symbols-outlined text-xl">{showPassword ? "visibility" : "visibility_off"}</span>
++                </button>
++              </div>
++              {error && (
++                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
++                  <span className="material-symbols-outlined text-sm">error</span>
++                  {error}
++                </p>
++              )}
++            </div>
++
++            <div className="h-4" />
++
++            <button
++              className="w-full h-14 bg-primary hover:bg-blue-700 active:scale-[0.98] text-white font-semibold rounded-xl text-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
++              type="submit"
++              disabled={submitting || (isStaff && staffList.length === 0)}
++            >
++              <span>{t("login_button")}</span>
++              <span className="material-symbols-outlined text-[20px]">login</span>
++            </button>
++
++            <div className="flex justify-center pt-2">
++              <a className="text-sm text-slate-500 hover:text-primary transition-colors" href="#">
++                {t("login_forgot_password")}
++              </a>
++            </div>
++          </form>
++        </div>
++
++        <div className="mt-auto py-8 flex flex-col items-center gap-1 text-center">
++          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("app_desc")}</p>
++          <p className="text-xs text-slate-400 dark:text-slate-600">{t("version")}</p>
++        </div>
++      </div>
++    </div>
++  );
++}
++
++
++
++
+
+--- a/src/pages/PrintPage.tsx
++++ b/src/pages/PrintPage.tsx
+@@ -0,0 +1,420 @@
++import { useEffect, useMemo, useState } from "react";
++import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
++import type { WorkRecord } from "../domain/types";
++import { getSession } from "../auth/session";
++import { activeEmployeeId } from "../auth/identity";
++import { listByMonth } from "../storage/todayRepo";
++import { listStaffPublic } from "../storage/staffRepo";
++import { useI18n } from "../i18n/I18nProvider";
++
++function currentMonthKey() {
++  const d = new Date();
++  const yyyy = d.getFullYear();
++  const mm = String(d.getMonth() + 1).padStart(2, "0");
++  return `${yyyy}-${mm}`;
++}
++
++function parseQuery() {
++  const params = new URLSearchParams(window.location.search);
++  const m = params.get("month") || params.get("yyyyMm") || params.get("ym");
++  const employeeId = params.get("employeeId") || params.get("staffId") || params.get("staff_id");
++  return {
++    month: m && /^\d{4}-\d{2}$/.test(m) ? m : null,
++    employeeId: employeeId || null,
++    all: Object.fromEntries(params.entries()),
++  };
++}
++
++const STD_WORK_MIN = 8 * 60;
++
++function daysInMonth(yyyy: number, mm1: number) {
++  return new Date(yyyy, mm1, 0).getDate();
++}
++function pad2(n: number) {
++  return String(n).padStart(2, "0");
++}
++function toISO(yyyy: number, mm1: number, dd: number) {
++  return `${yyyy}-${pad2(mm1)}-${pad2(dd)}`;
++}
++function formatMDWithDow(yyyy: number, mm1: number, dd: number, dows: string[]) {
++  const d = new Date(yyyy, mm1 - 1, dd);
++  const dow = dows[d.getDay()];
++  return `${mm1}/${dd}(${dow})`;
++}
++
++type Row = {
++  dateISO: string;
++  label: string;
++  checkIn: string;
++  checkOut: string;
++  breakText: string;
++  workText: string;
++  overtimeText: string;
++  earlyLeaveText: string;
++  status: "empty" | "incomplete" | "complete" | "holiday";
++};
++
++export default function PrintPage() {
++  const { t, lang } = useI18n();
++  const DOW = lang === "ja" ? ["?", "?", "?", "?", "?", "?", "?"] : ["?", "?", "?", "?", "?", "?", "?"];
++  const { month, employeeId: queryEmployee, all } = useMemo(() => parseQuery(), []);
++  const yyyyMm = useMemo(() => month ?? currentMonthKey(), [month]);
++  const session = getSession();
++  const sessionEmployeeId = activeEmployeeId(session);
++
++  const [records, setRecords] = useState<WorkRecord[]>([]);
++  const [staffName, setStaffName] = useState<string | null>(null);
++  const [targetUserId, setTargetUserId] = useState<string | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => {
++    let cancelled = false;
++    async function load() {
++      setLoading(true);
++      setError(null);
++      try {
++        if (queryEmployee) {
++          const staffList = await listStaffPublic();
++          const match = staffList.find((s) => s.staffId === queryEmployee);
++          const uid = match?.userId ?? null;
++          setStaffName(match?.name ?? match?.displayName ?? queryEmployee);
++          setTargetUserId(uid);
++          if (!uid) {
++            setError(t("print_no_info"));
++            return;
++          }
++          const rows = await listByMonth(yyyyMm, uid);
++          if (!cancelled) setRecords(rows);
++          if (import.meta.env.DEV) {
++            console.log("[PRINT] loaded", {
++              page: "PrintPage",
++              yyyyMm,
++              staffId: queryEmployee,
++              targetUserId: uid,
++              count: rows.length,
++              sample: rows[0],
++            });
++          }
++        } else {
++          const rows = await listByMonth(yyyyMm);
++          if (!cancelled) {
++            setRecords(rows);
++            setStaffName(sessionEmployeeId);
++            setTargetUserId("self");
++          }
++          if (import.meta.env.DEV) {
++            console.log("[PRINT] loaded", {
++              page: "PrintPage",
++              yyyyMm,
++              staffId: null,
++              targetUserId: "self",
++              count: rows.length,
++              sample: rows[0],
++            });
++          }
++        }
++      } catch (e: any) {
++        console.error(e);
++        if (!cancelled) setError(e?.message ?? "Failed to load data");
++      } finally {
++        if (!cancelled) setLoading(false);
++      }
++    }
++    load();
++    return () => {
++      cancelled = true;
++    };
++  }, [yyyyMm, queryEmployee, sessionEmployeeId, t]);
++
++  const model = useMemo(() => {
++    if (error || loading) return null;
++    const [yyyy, mm1] = yyyyMm.split("-").map(Number);
++    const lastDay = daysInMonth(yyyy, mm1);
++    const filtered = records.filter((r) => r.date.startsWith(yyyyMm));
++    const byDate = new Map<string, WorkRecord>(filtered.map((r) => [r.date, r]));
++
++    const rows: Row[] = [];
++    let workDays = 0;
++    let incompleteDays = 0;
++    let holidayDays = 0;
++    let totalWorkMin = 0;
++    let totalBreakMin = 0;
++    let totalOvertimeMin = 0;
++    let totalEarlyLeaveMin = 0;
++
++    for (let dd = 1; dd <= lastDay; dd++) {
++      const dateISO = toISO(yyyy, mm1, dd);
++      const label = formatMDWithDow(yyyy, mm1, dd, DOW);
++
++      const r = byDate.get(dateISO);
++      const isHoliday = r?.note === "OFF";
++      const daily = !r || isHoliday ? { workMin: null, breakMin: 0 } : calcDailyWorkMin(r);
++
++      const workMin = daily.workMin;
++      const breakMin = isHoliday ? 0 : daily.breakMin ?? 0;
++
++      const overtimeMin = workMin === null ? null : Math.max(0, workMin - STD_WORK_MIN);
++      const earlyLeaveMin = workMin === null ? null : Math.max(0, STD_WORK_MIN - workMin);
++
++      const hasCheckIn = !!r?.checkIn;
++      const hasCheckOut = !!r?.checkOut;
++      const hasAnyInput = !isHoliday && (hasCheckIn || hasCheckOut || (!!r && Number(r.breakMin ?? 0) > 0));
++
++      const status: Row["status"] = isHoliday ? "holiday" : !hasAnyInput ? "empty" : workMin === null ? "incomplete" : "complete";
++
++      const checkIn = isHoliday ? "--" : hasCheckIn ? r!.checkIn! : "--";
++      const checkOut = isHoliday ? "--" : hasCheckOut ? r!.checkOut! : status === "incomplete" && hasCheckIn ? t("print_incomplete") : "--";
++
++      const breakText = isHoliday ? "--" : hasAnyInput && breakMin > 0 ? minToHhmm(breakMin) : "--";
++      const workText =
++        status === "holiday" ? t("print_holiday") : status === "complete" ? minToHhmm(workMin!) : status === "incomplete" ? t("print_incomplete") : "--";
++
++      const overtimeText = status === "holiday" || overtimeMin === null || overtimeMin === 0 ? "--" : minToHhmm(overtimeMin);
++      const earlyLeaveText = status === "holiday" || earlyLeaveMin === null || earlyLeaveMin === 0 ? "--" : minToHhmm(earlyLeaveMin);
++
++      if (!isHoliday && workMin !== null) totalWorkMin += workMin;
++      if (!isHoliday && hasAnyInput) totalBreakMin += breakMin;
++      if (!isHoliday && overtimeMin !== null) totalOvertimeMin += overtimeMin;
++      if (!isHoliday && earlyLeaveMin !== null) totalEarlyLeaveMin += earlyLeaveMin;
++      if (status === "complete") workDays += 1;
++      if (status === "incomplete") incompleteDays += 1;
++      if (status === "holiday") holidayDays += 1;
++
++      rows.push({
++        dateISO,
++        label,
++        checkIn,
++        checkOut,
++        breakText,
++        workText,
++        overtimeText,
++        earlyLeaveText,
++        status,
++      });
++    }
++
++    return {
++      yyyy,
++      mm1,
++      yyyyMm,
++      rows,
++      summary: {
++        workDays,
++        incompleteDays,
++        holidayDays,
++        totalWorkMin,
++        totalBreakMin,
++        totalOvertimeMin,
++        totalEarlyLeaveMin,
++      },
++    };
++  }, [yyyyMm, records, error, loading, DOW, t]);
++
++  if (loading) {
++    return <div style={{ padding: 16 }}>{t("print_loading")}</div>;
++  }
++
++  if (!model || error) {
++    return (
++      <div style={{ padding: 16 }}>
++        <h2>{t("print_no_info")}</h2>
++        <div>{error ?? t("print_invalid_month")}</div>
++        <div className="no-print" style={{ marginTop: 8, fontSize: 12, color: "#475569" }}>
++          params: {JSON.stringify(all)}
++        </div>
++      </div>
++    );
++  }
++
++  const monthTitle = `${model.yyyy}-${String(model.mm1).padStart(2, "0")}`;
++  const employeeLine = queryEmployee ? `${t("login_staff_select_label")}: ${staffName ?? queryEmployee}` : null;
++
++  return (
++    <div style={{ background: "#fff", color: "#111" }}>
++      <div className="no-print" style={{ padding: 8, fontSize: 12, color: "#0f172a" }}>
++        [PRINT SOURCE] PrintPage.tsx {new Date().toISOString()}
++        <div>params: {JSON.stringify(all)}</div>
++        <div>yyyyMm: {yyyyMm} / staffId: {queryEmployee ?? "self"} / targetUserId: {targetUserId ?? "self"}</div>
++        <div>loaded: {records.length} {records[0] && `sample.date=${records[0].date}`}</div>
++      </div>
++
++      <style>{`
++        @page { size: A4; margin: 12mm; }
++
++        @media print {
++          body { background: white; }
++          .no-print { display: none !important; }
++          .printRoot { padding: 0; }
++          .sheet { box-shadow: none; }
++        }
++
++        .printRoot{
++          background: #f3f4f6;
++          min-height: 100vh;
++          padding: 12px;
++          color: #111827;
++          font-family: "Noto Sans KR", "Noto Sans", system-ui, -apple-system, sans-serif;
++        }
++        .sheet{
++          max-width: 780px;
++          margin: 0 auto;
++          background: white;
++          border: 1px solid #d1d5db;
++          border-radius: 12px;
++          padding: 14px 16px;
++          box-shadow: 0 10px 30px rgba(0,0,0,.08);
++        }
++        .toolbar{
++          display:flex;
++          justify-content:flex-end;
++          gap:8px;
++          margin: 0 auto 10px;
++          max-width: 780px;
++        }
++        .btn{
++          padding: 8px 12px;
++          border: 1px solid #cbd5e1;
++          background: white;
++          border-radius: 8px;
++          cursor: pointer;
++          font-weight: 700;
++          font-size: 13px;
++        }
++        .head{
++          display:flex;
++          align-items:center;
++          justify-content:space-between;
++          gap: 10px;
++          margin-bottom: 10px;
++        }
++        .title{
++          margin: 0;
++          font-size: 18px;
++          font-weight: 900;
++          letter-spacing: -0.01em;
++        }
++        .monthBadge{
++          padding: 4px 10px;
++          border-radius: 10px;
++          background: #e5f2ff;
++          border: 1px solid #bfdbfe;
++          font-weight: 800;
++        }
++        .summary{
++          display:grid;
++          grid-template-columns: repeat(5, 1fr);
++          gap: 6px 10px;
++          margin: 0 0 10px 0;
++          border: 1px solid #d1d5db;
++          border-radius: 10px;
++          padding: 8px 10px;
++          font-size: 12px;
++        }
++        .sumItem{
++          display:flex;
++          align-items:center;
++          justify-content:space-between;
++          gap: 8px;
++          white-space: nowrap;
++        }
++        .sumLabel{ color: #4b5563; font-weight: 700; }
++        .sumVal{ font-weight: 900; color: #111827; }
++
++        table{
++          width: 100%;
++          border-collapse: collapse;
++          table-layout: fixed;
++          font-size: 11.5px;
++        }
++        th, td{
++          border: 1px solid #d1d5db;
++          padding: 4px 6px;
++          height: 20px;
++          line-height: 1.2;
++          text-align: center;
++        }
++        thead th{
++          background: #f3f4f6;
++          font-weight: 800;
++          color: #111827;
++        }
++        .left{ text-align:left; }
++        .muted{ color: #9ca3af; }
++        .warn{ color: #d97706; font-weight: 800; }
++        tr { page-break-inside: avoid; }
++      `}</style>
++
++      <div className="no-print toolbar">
++        <button className="btn" type="button" onClick={() => window.print()}>
++          {t("print_button")}
++        </button>
++      </div>
++
++      <div className="printRoot">
++        <div className="sheet">
++          <div className="head">
++            <div>
++              <h1 className="title">{t("print_title")} ({monthTitle})</h1>
++              {employeeLine && <div style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>{employeeLine}</div>}
++            </div>
++            <div className="monthBadge">{monthTitle}</div>
++          </div>
++
++          <div className="summary">
++            <div className="sumItem">
++              <span className="sumLabel">{t("print_total_work")}</span>
++              <span className="sumVal">{minToHhmm(model.summary.totalWorkMin)}</span>
++            </div>
++            <div className="sumItem">
++              <span className="sumLabel">{t("print_total_break")}</span>
++              <span className="sumVal">{minToHhmm(model.summary.totalBreakMin)}</span>
++            </div>
++            <div className="sumItem">
++              <span className="sumLabel">{t("print_workdays")}</span>
++              <span className="sumVal">{model.summary.workDays}</span>
++            </div>
++            <div className="sumItem">
++              <span className="sumLabel">{t("print_incomplete")}</span>
++              <span className="sumVal">{model.summary.incompleteDays}</span>
++            </div>
++            <div className="sumItem">
++              <span className="sumLabel">{t("print_holiday_days")}</span>
++              <span className="sumVal">{model.summary.holidayDays}</span>
++            </div>
++          </div>
++
++          <table>
++            <thead>
++              <tr>
++                <th style={{ width: "18%" }}>{t("print_date")}</th>
++                <th style={{ width: "13%" }}>{t("print_check_in")}</th>
++                <th style={{ width: "13%" }}>{t("print_check_out")}</th>
++                <th style={{ width: "12%" }}>{t("print_break")}</th>
++                <th style={{ width: "16%" }}>{t("print_work")}</th>
++                <th style={{ width: "14%" }}>{t("print_overtime")}</th>
++                <th style={{ width: "14%" }}>{t("print_early_leave")}</th>
++              </tr>
++            </thead>
++
++            <tbody>
++              {model.rows.map((r) => (
++                <tr key={r.dateISO}>
++                  <td className="left">{r.label}</td>
++                  <td>{r.checkIn}</td>
++                  <td className={r.checkOut === t("print_incomplete") ? "warn" : ""}>{r.checkOut}</td>
++                  <td className={r.breakText === "--" ? "muted" : ""}>{r.breakText}</td>
++                  <td className={r.status === "incomplete" ? "warn" : r.status === "empty" || r.status === "holiday" ? "muted" : ""}>
++                    {r.workText}
++                  </td>
++                  <td className={r.overtimeText === "--" ? "muted" : ""}>{r.overtimeText}</td>
++                  <td className={r.earlyLeaveText === "--" ? "muted" : ""}>{r.earlyLeaveText}</td>
++                </tr>
++              ))}
++            </tbody>
++          </table>
++        </div>
++      </div>
++    </div>
++  );
++}
+
+--- a/src/pages/PrintMonthlyPage.tsx
++++ b/src/pages/PrintMonthlyPage.tsx
+@@ -0,0 +1,287 @@
++import { useEffect, useMemo, useState } from "react";
++import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
++import { listByMonth } from "../storage/todayRepo";
++import { useI18n } from "../i18n/I18nProvider";
++
++function getMonthFromQuery() {
++  const params = new URLSearchParams(window.location.search);
++  const m = params.get("month") || params.get("yyyyMm") || params.get("ym");
++  return m ?? "";
++}
++
++const STD_WORK_MIN = 8 * 60;
++
++function daysInMonth(yyyy: number, mm1: number) {
++  return new Date(yyyy, mm1, 0).getDate();
++}
++function pad2(n: number) {
++  return String(n).padStart(2, "0");
++}
++function toISO(yyyy: number, mm1: number, dd: number) {
++  return `${yyyy}-${pad2(mm1)}-${pad2(dd)}`;
++}
++function formatMDWithDow(yyyy: number, mm1: number, dd: number, dows: string[]) {
++  const d = new Date(yyyy, mm1 - 1, dd);
++  const dow = dows[d.getDay()];
++  return `${mm1}/${dd}(${dow})`;
++}
++
++export default function PrintMonthlyPage() {
++  const { t, lang } = useI18n();
++  const DOW = lang === "ja" ? ["?", "?", "?", "?", "?", "?", "?"] : ["?", "?", "?", "?", "?", "?", "?"];
++  const yyyyMm = getMonthFromQuery();
++  const [records, setRecords] = useState<any[]>([]);
++  const [error, setError] = useState<string | null>(null);
++  const [loading, setLoading] = useState(true);
++
++  useEffect(() => {
++    let cancelled = false;
++    async function load() {
++      try {
++        if (!yyyyMm || !/^\d{4}-\d{2}$/.test(yyyyMm)) return;
++        const rows = await listByMonth(yyyyMm);
++        if (!cancelled) setRecords(rows);
++        if (import.meta.env.DEV) console.log("[PrintMonthly] loaded", { yyyyMm, count: rows.length, sample: rows[0] });
++      } catch (e: any) {
++        console.error(e);
++        if (!cancelled) setError(e?.message ?? "Failed to load data");
++      } finally {
++        if (!cancelled) setLoading(false);
++      }
++    }
++    load();
++    return () => {
++      cancelled = true;
++    };
++  }, [yyyyMm]);
++
++  const model = useMemo(() => {
++    if (!yyyyMm || !/^\d{4}-\d{2}$/.test(yyyyMm) || error || loading) return null;
++
++    const yyyy = Number(yyyyMm.slice(0, 4));
++    const mm1 = Number(yyyyMm.slice(5, 7));
++    const lastDay = daysInMonth(yyyy, mm1);
++
++    const byDate = new Map(records.map((r) => [r.date, r]));
++
++    const rows = Array.from({ length: lastDay }, (_, i) => {
++      const dd = i + 1;
++      const dateISO = toISO(yyyy, mm1, dd);
++      const label = formatMDWithDow(yyyy, mm1, dd, DOW);
++
++      const r = byDate.get(dateISO);
++      const isHoliday = r?.note === "OFF";
++      const daily = r && !isHoliday ? calcDailyWorkMin(r) : { workMin: null, breakMin: 0 };
++
++      const workMin = daily.workMin;
++      const breakMin = isHoliday ? 0 : daily.breakMin ?? 0;
++
++      const overtimeMin = workMin === null ? null : Math.max(0, workMin - STD_WORK_MIN);
++      const earlyLeaveMin = workMin === null ? null : Math.max(0, STD_WORK_MIN - workMin);
++
++      return {
++        dateISO,
++        label,
++        checkIn: isHoliday ? "" : r?.checkIn ?? "",
++        checkOut: isHoliday ? "" : r?.checkOut ?? "",
++        breakMin,
++        workMin,
++        overtimeMin,
++        earlyLeaveMin,
++        isHoliday,
++      };
++    });
++
++    let workDays = 0;
++    let incompleteDays = 0;
++    let holidayDays = 0;
++    let totalWorkMin = 0;
++    let totalBreakMin = 0;
++    let totalOvertimeMin = 0;
++    let totalEarlyLeaveMin = 0;
++
++    for (const r of rows) {
++      if (r.isHoliday) {
++        holidayDays += 1;
++        continue;
++      }
++      const hasAny = !!(r.checkIn || r.checkOut);
++      const isComplete = !!(r.checkIn && r.checkOut);
++
++      if (hasAny) workDays += 1;
++      if (hasAny && !isComplete) incompleteDays += 1;
++
++      if (r.workMin !== null) totalWorkMin += r.workMin;
++      totalBreakMin += r.breakMin ?? 0;
++
++      if (r.overtimeMin !== null) totalOvertimeMin += r.overtimeMin;
++      if (r.earlyLeaveMin !== null) totalEarlyLeaveMin += r.earlyLeaveMin;
++    }
++
++    return {
++      yyyy,
++      mm1,
++      yyyyMm,
++      rows,
++      summary: {
++        workDays,
++        incompleteDays,
++        holidayDays,
++        totalWorkMin,
++        totalBreakMin,
++        totalOvertimeMin,
++        totalEarlyLeaveMin,
++      },
++    };
++  }, [yyyyMm, records, error, loading, DOW]);
++
++  if (loading) {
++    return <div style={{ padding: 16 }}>{t("print_loading")}</div>;
++  }
++
++  if (!model || error) {
++    return (
++      <div style={{ padding: 16 }}>
++        <h2>{t("print_no_info")}</h2>
++        <div>{error ?? t("print_invalid_month")}</div>
++      </div>
++    );
++  }
++
++  return (
++    <div style={{ background: "#fff", color: "#111" }}>
++      <div className="no-print" style={{ padding: 8, fontSize: 12, color: "#0f172a" }}>
++        [PRINT SOURCE] PrintMonthlyPage.tsx {new Date().toISOString()}
++        <div>params: {JSON.stringify({ month: yyyyMm })}</div>
++        <div>loaded: {records.length} {records[0] && `sample.date=${records[0].date}`}</div>
++      </div>
++      <style>{`
++        @page { size: A4; margin: 12mm; }
++        @media print {
++          body { background: white; }
++          .no-print { display: none !important; }
++          .printRoot { padding: 0; }
++          .sheet { box-shadow: none; }
++        }
++      `}</style>
++
++      <div
++        className="printRoot"
++        style={{
++          background: "#f3f4f6",
++          minHeight: "100vh",
++          padding: 12,
++          color: "#111827",
++          fontFamily: '"Noto Sans KR", "Noto Sans", system-ui, -apple-system, sans-serif',
++        }}
++      >
++        <div
++          className="sheet"
++          style={{
++            maxWidth: 780,
++            margin: "0 auto",
++            background: "#fff",
++            border: "1px solid #d1d5db",
++            borderRadius: 12,
++            padding: "14px 16px",
++            boxShadow: "0 10px 30px rgba(0,0,0,.08)",
++          }}
++        >
++          <div className="toolbar no-print" style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 10 }}>
++            <button
++              className="btn"
++              onClick={() => window.print()}
++              style={{ padding: "8px 12px", border: "1px solid #cbd5e1", background: "#fff", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: 13 }}
++            >
++              {t("print_button")}
++            </button>
++          </div>
++
++          <div className="head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
++            <div>
++              <h1 className="title" style={{ margin: 0, fontSize: 18, fontWeight: 900, letterSpacing: "-0.01em" }}>
++                {t("print_monthly_title")} ({yyyyMm})
++              </h1>
++            </div>
++          </div>
++
++          <div
++            className="summary"
++            style={{
++              display: "grid",
++              gridTemplateColumns: "repeat(5, 1fr)",
++              gap: "6px 10px",
++              margin: "0 0 10px 0",
++              border: "1px solid #d1d5db",
++              borderRadius: 10,
++              padding: "8px 10px",
++              fontSize: 12,
++            }}
++          >
++            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, whiteSpace: "nowrap" }}>
++              <span style={{ color: "#4b5563", fontWeight: 700 }}>{t("print_total_work")}</span>
++              <span style={{ fontWeight: 900, color: "#111827" }}>{minToHhmm(model.summary.totalWorkMin)}</span>
++            </div>
++            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, whiteSpace: "nowrap" }}>
++              <span style={{ color: "#4b5563", fontWeight: 700 }}>{t("print_total_break")}</span>
++              <span style={{ fontWeight: 900, color: "#111827" }}>{minToHhmm(model.summary.totalBreakMin)}</span>
++            </div>
++            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, whiteSpace: "nowrap" }}>
++              <span style={{ color: "#4b5563", fontWeight: 700 }}>{t("print_workdays")}</span>
++              <span style={{ fontWeight: 900, color: "#111827" }}>{model.summary.workDays}</span>
++            </div>
++            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, whiteSpace: "nowrap" }}>
++              <span style={{ color: "#4b5563", fontWeight: 700 }}>{t("print_incomplete")}</span>
++              <span style={{ fontWeight: 900, color: "#111827" }}>{model.summary.incompleteDays}</span>
++            </div>
++            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, whiteSpace: "nowrap" }}>
++              <span style={{ color: "#4b5563", fontWeight: 700 }}>{t("print_holiday_days")}</span>
++              <span style={{ fontWeight: 900, color: "#111827" }}>{model.summary.holidayDays}</span>
++            </div>
++          </div>
++
++          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: "11.5px" }}>
++            <thead>
++              <tr>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_date")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_check_in")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_check_out")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_break")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_work")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_overtime")}</th>
++                <th style={{ border: "1px solid #d1d5db", padding: "4px 6px", background: "#f3f4f6" }}>{t("print_early_leave")}</th>
++              </tr>
++            </thead>
++            <tbody>
++              {model.rows.map((r) => {
++                const workMin = r.workMin;
++                const isHoliday = r.isHoliday;
++                const breakText = isHoliday ? "--" : r.breakMin > 0 ? minToHhmm(r.breakMin) : "--";
++                const workText = isHoliday ? t("print_holiday") : workMin === null ? t("print_incomplete") : minToHhmm(workMin);
++                const overtimeText = isHoliday || r.overtimeMin === null || r.overtimeMin === 0 ? "--" : minToHhmm(r.overtimeMin);
++                const earlyLeaveText = isHoliday || r.earlyLeaveMin === null || r.earlyLeaveMin === 0 ? "--" : minToHhmm(r.earlyLeaveMin);
++                const hasAny = !!(r.checkIn || r.checkOut);
++                const status = isHoliday ? "holiday" : !hasAny ? "empty" : workMin === null ? "incomplete" : "complete";
++                return (
++                  <tr key={r.dateISO}>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", textAlign: "left" }}>{r.label}</td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px" }}>{isHoliday ? "--" : r.checkIn || "--"}</td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", color: status === "incomplete" ? "#d97706" : undefined }}>
++                      {isHoliday ? "--" : r.checkOut || (status === "incomplete" && r.checkIn ? t("print_incomplete") : "--")}
++                    </td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", color: breakText === "--" ? "#9ca3af" : undefined }}>{breakText}</td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", color: status === "incomplete" ? "#d97706" : status === "empty" || status === "holiday" ? "#9ca3af" : undefined }}>
++                      {workText}
++                    </td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", color: overtimeText === "--" ? "#9ca3af" : undefined }}>{overtimeText}</td>
++                    <td style={{ border: "1px solid #d1d5db", padding: "4px 6px", color: earlyLeaveText === "--" ? "#9ca3af" : undefined }}>{earlyLeaveText}</td>
++                  </tr>
++                );
++              })}
++            </tbody>
++          </table>
++        </div>
++      </div>
++    </div>
++  );
++}
+
+--- a/src/pages/MonthlyPage.tsx
++++ b/src/pages/MonthlyPage.tsx
+@@ -0,0 +1,133 @@
++import { useEffect, useState } from "react";
++import { calcMonthlySummary, minToHhmm } from "../domain/timeCalc";
++import { useI18n } from "../i18n/I18nProvider";
++import { listByMonth } from "../storage/todayRepo";
++
++function currentMonthKey() {
++  const d = new Date();
++  const yyyy = d.getFullYear();
++  const mm = String(d.getMonth() + 1).padStart(2, "0");
++  return `${yyyy}-${mm}`;
++}
++
++function formatMonthTitle(yyyyMm: string) {
++  const [y, m] = yyyyMm.split("-").map(Number);
++  return `${y}.${m}`;
++}
++
++export default function MonthlyPage() {
++  const [yyyyMm, setYyyyMm] = useState(currentMonthKey());
++  const { t, lang } = useI18n();
++
++  const [summary, setSummary] = useState(() => calcMonthlySummary([], yyyyMm));
++  const [holidayDays, setHolidayDays] = useState(0);
++
++  useEffect(() => {
++    let cancelled = false;
++    async function load() {
++      const rows = await listByMonth(yyyyMm);
++      if (cancelled) return;
++      setSummary(calcMonthlySummary(rows, yyyyMm));
++      setHolidayDays(rows.filter((r) => r.note === "OFF").length);
++      if (import.meta.env.DEV) console.log("[MonthlyPage] loaded", { yyyyMm, count: rows.length });
++    }
++    load();
++    return () => {
++      cancelled = true;
++    };
++  }, [yyyyMm]);
++
++  function onPrint() {
++    window.open(`/print?month=${encodeURIComponent(yyyyMm)}`, "_blank");
++  }
++
++  const hasIncomplete = summary.incompleteDays > 0;
++  const dash = t("common_dash");
++
++  return (
++    <div className="page" key={lang}>
++      <div className="topbar">
++        <div className="topbarRow">
++          <div style={{ width: 40 }} />
++          <div className="topbarTitle">{t("staff_monthly_title")}</div>
++          <div style={{ width: 40 }} />
++        </div>
++      </div>
++
++      {/* Month selector + PDF */}
++      <div className="monthRow">
++        <button className="monthBtn" type="button" onClick={() => {}}>
++          <div className="monthTitle">{formatMonthTitle(yyyyMm)}</div>
++          <span className="material-symbols-outlined" style={{ color: "var(--muted)" }}>
++            expand_more
++          </span>
++
++          <input
++            type="month"
++            value={yyyyMm}
++            onChange={(e) => setYyyyMm(e.target.value)}
++            style={{
++              position: "absolute",
++              opacity: 0,
++              pointerEvents: "none",
++              width: 0,
++              height: 0,
++            }}
++            aria-hidden
++            tabIndex={-1}
++          />
++        </button>
++
++        <button className="pillBtn" type="button" onClick={onPrint}>
++          {t("staff_monthly_pdf")}
++        </button>
++      </div>
++
++      {/* Main grid card */}
++      <div className="gridCard">
++        <div className="grid2x2">
++          <div className="gridCell">
++            <div className="gridLabel">{t("staff_monthly_total_work")}</div>
++            <div className="gridValue">{summary.totalWork ? minToHhmm(summary.totalWork) : dash}</div>
++          </div>
++
++          <div className="gridCell">
++            <div className="gridLabel">{t("staff_monthly_total_break")}</div>
++            <div className="gridValue">{summary.totalBreak ? minToHhmm(summary.totalBreak) : dash}</div>
++          </div>
++
++          <div className="gridCell">
++            <div className="gridLabel">{t("staff_monthly_days")}</div>
++            <div className="gridValue">{summary.workDays}</div>
++          </div>
++
++          <div className="gridCell incompleteCell">
++            <div className="gridLabel">{t("staff_monthly_incomplete")}</div>
++            <div className="gridValue">
++              {summary.incompleteDays}{" "}
++              <span style={{ fontSize: 12, fontWeight: 700, opacity: 0.8 }}>{t("staff_monthly_incomplete_hint")}</span>
++            </div>
++          </div>
++        </div>
++        <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)", fontWeight: 700 }}>
++          {t("common_holiday")}: {holidayDays}
++        </div>
++      </div>
++
++      {/* optional banner */}
++      {hasIncomplete && (
++        <div className="warnCard" role="button" tabIndex={0}>
++          <div>
++            <div className="warnTitle">{t("staff_monthly_warn_title")}</div>
++            <div className="warnSub">{t("staff_monthly_warn_sub").replace("{count}", String(summary.incompleteDays))}</div>
++          </div>
++          <div className="warnArrow">
++            <span className="material-symbols-outlined" style={{ color: "var(--muted)" }}>
++              arrow_forward
++            </span>
++          </div>
++        </div>
++      )}
++    </div>
++  );
++}
+
+--- a/src/pages/AdminMonthlyPage.tsx
++++ b/src/pages/AdminMonthlyPage.tsx
+@@ -0,0 +1,239 @@
++import { useEffect, useMemo, useState } from "react";
++import { useNavigate } from "react-router-dom";
++import AppBar from "../components/AppBar";
++import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
++import { useI18n } from "../i18n/I18nProvider";
++import { listStaffPublic } from "../storage/staffRepo";
++import { listByMonth } from "../storage/todayRepo";
++
++function currentMonthKey() {
++  const d = new Date();
++  const yyyy = d.getFullYear();
++  const mm = String(d.getMonth() + 1).padStart(2, "0");
++  return `${yyyy}-${mm}`;
++}
++
++function shiftMonth(yyyyMm: string, delta: number) {
++  const [y, m] = yyyyMm.split("-").map(Number);
++  const d = new Date(y, m - 1 + delta, 1);
++  const yyyy = d.getFullYear();
++  const mm = String(d.getMonth() + 1).padStart(2, "0");
++  return `${yyyy}-${mm}`;
++}
++
++type StaffRow = {
++  id: string;
++  name: string;
++  userId: string | null;
++  days: number;
++  totalWorkMin: number;
++  totalBreakMin: number;
++  incompleteDays: number;
++  completedDays: number;
++  holidayDays: number;
++  avgMin: number;
++};
++
++export default function AdminMonthlyPage() {
++  const nav = useNavigate();
++  const [yyyyMm, setYyyyMm] = useState(currentMonthKey());
++  const { t, lang } = useI18n();
++
++  const [rows, setRows] = useState<StaffRow[]>([]);
++
++  useEffect(() => {
++    let cancelled = false;
++    async function load() {
++      try {
++        const staffList = await listStaffPublic();
++        if (cancelled) return;
++        const mapped: StaffRow[] = [];
++        for (const s of staffList) {
++          if (!s.userId) {
++            mapped.push({
++              id: s.staffId,
++              name: s.name ?? s.displayName ?? s.staffId,
++              userId: null,
++              days: 0,
++              totalWorkMin: 0,
++              totalBreakMin: 0,
++              incompleteDays: 0,
++              completedDays: 0,
++              holidayDays: 0,
++              avgMin: 0,
++            });
++            continue;
++          }
++          const records = await listByMonth(yyyyMm, s.userId);
++          let days = 0;
++          let totalWorkMin = 0;
++          let totalBreakMin = 0;
++          let incompleteDays = 0;
++          let completedDays = 0;
++          let holidayDays = 0;
++
++          for (const r of records) {
++            if (r.note === "OFF") {
++              holidayDays += 1;
++              continue;
++            }
++            const daily = calcDailyWorkMin(r);
++            days += 1;
++            totalBreakMin += daily.breakMin ?? 0;
++            if (daily.workMin === null) {
++              if (r.checkIn || r.checkOut) incompleteDays += 1;
++            } else {
++              totalWorkMin += daily.workMin;
++              completedDays += 1;
++            }
++          }
++          const avgMin = completedDays === 0 ? 0 : Math.round(totalWorkMin / completedDays);
++          mapped.push({
++            id: s.staffId,
++            name: s.name ?? s.displayName ?? s.staffId,
++            userId: s.userId,
++            days,
++            totalWorkMin,
++            totalBreakMin,
++            incompleteDays,
++            completedDays,
++            holidayDays,
++            avgMin,
++          });
++        }
++        if (cancelled) return;
++        setRows(mapped);
++        if (import.meta.env.DEV) {
++          console.log("[AdminMonthly] loaded", { yyyyMm, staffCount: staffList.length, rows: mapped.length });
++          if (mapped[0]) console.log("[AdminMonthly] sample row", mapped[0]);
++        }
++      } catch (e) {
++        if (import.meta.env.DEV) console.error("[AdminMonthly] load failed", e);
++      }
++    }
++    load();
++    return () => {
++      cancelled = true;
++    };
++  }, [yyyyMm]);
++
++  const totalSummary = useMemo(() => {
++    let totalWorkMin = 0;
++    let totalBreakMin = 0;
++    let totalIncomplete = 0;
++    let totalHoliday = 0;
++    for (const r of rows) {
++      totalWorkMin += r.totalWorkMin;
++      totalBreakMin += r.totalBreakMin;
++      totalIncomplete += r.incompleteDays;
++      totalHoliday += r.holidayDays;
++    }
++    return { totalWorkMin, totalBreakMin, totalIncomplete, totalHoliday, staffCount: rows.length };
++  }, [rows]);
++
++  return (
++    <div key={lang} className="bg-background-light dark:bg-background-dark text-[#0c141d] dark:text-white font-display min-h-screen">
++      <div className="relative flex flex-col w-full max-w-[480px] mx-auto min-h-screen overflow-x-hidden bg-background-light dark:bg-background-dark pb-8">
++        <AppBar title={t("admin_monthly_title")} subtitle={t("admin_monthly_desc")} showBack />
++
++        <main className="flex-1 flex flex-col px-5 pt-4 gap-6">
++          <div className="monthRow">
++            <button
++              className="monthBtn"
++              type="button"
++              onClick={() => setYyyyMm(shiftMonth(yyyyMm, -1))}
++              aria-label={t("admin_monthly_prev_month")}
++            >
++              <span className="material-symbols-outlined" style={{ color: "var(--muted)" }}>
++                chevron_left
++              </span>
++            </button>
++            <div style={{ textAlign: "center" }}>
++              <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.02em" }}>{yyyyMm}</div>
++            </div>
++            <button
++              className="monthBtn"
++              type="button"
++              onClick={() => setYyyyMm(shiftMonth(yyyyMm, 1))}
++              aria-label={t("admin_monthly_next_month")}
++            >
++              <span className="material-symbols-outlined" style={{ color: "var(--muted)" }}>
++                chevron_right
++              </span>
++            </button>
++          </div>
++
++          <div className="gridCard">
++            <div className="grid2x2">
++              <div className="gridCell">
++                <div className="gridLabel">{t("admin_monthly_th_total")}</div>
++                <div className="gridValue">{minToHhmm(totalSummary.totalWorkMin)}</div>
++              </div>
++              <div className="gridCell">
++                <div className="gridLabel">{t("today_sum_break")}</div>
++                <div className="gridValue">{minToHhmm(totalSummary.totalBreakMin)}</div>
++              </div>
++              <div className="gridCell incompleteCell">
++                <div className="gridLabel">{t("admin_monthly_th_incomplete")}</div>
++                <div className="gridValue">{totalSummary.totalIncomplete}</div>
++              </div>
++              <div className="gridCell">
++                <div className="gridLabel">{t("admin_monthly_th_staff")}</div>
++                <div className="gridValue">{totalSummary.staffCount}</div>
++              </div>
++            </div>
++            <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)", fontWeight: 700 }}>
++              {t("common_holiday")}: {totalSummary.totalHoliday}
++            </div>
++          </div>
++
++          <section
++            aria-label="Staff Monthly Summary"
++            className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-700"
++          >
++            <h2 className="text-lg font-bold text-[#0c141d] dark:text-white mb-2 px-1">{t("admin_monthly_staff_list")}</h2>
++            <div className="flex flex-col">
++              {rows.length === 0 && (
++                <div className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">{t("admin_monthly_empty_staff")}</div>
++              )}
++              {rows.map((r) => (
++                <button
++                  key={r.id}
++                  type="button"
++                  onClick={() => nav(`/admin/staff/${r.id}?month=${encodeURIComponent(yyyyMm)}&userId=${encodeURIComponent(r.userId ?? "")}`)}
++                  className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-slate-700 last:border-0 text-left"
++                >
++                  <div className="flex items-center gap-3">
++                    <div className="relative size-10 rounded-full bg-slate-100 overflow-hidden">
++                      <span className="absolute inset-0 flex items-center justify-center text-slate-400 font-bold text-sm">
++                        {r.name.charAt(0)}
++                      </span>
++                    </div>
++                    <div className="flex flex-col">
++                      <span className="text-base font-semibold text-[#0c141d] dark:text-white">{r.name}</span>
++                      <span className="text-xs text-slate-400">{r.id}</span>
++                    </div>
++                  </div>
++                  <div className="flex flex-col items-end gap-1">
++                    <span className="text-sm font-bold text-[#0c141d] dark:text-white">{minToHhmm(r.totalWorkMin)}</span>
++                    <div className="flex items-center gap-4 text-xs text-slate-500">
++                      <span>
++                        {t("admin_monthly_th_days")} {r.completedDays}
++                      </span>
++                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">
++                        {t("admin_monthly_th_incomplete")} {r.incompleteDays}
++                      </span>
++                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
++                        {t("common_holiday")} {r.holidayDays}
++                      </span>
++                    </div>
++                  </div>
++                </button>
++              ))}
++            </div>
++          </section>
++        </main>
++      </div>
++    </div>
++  );
++}
+

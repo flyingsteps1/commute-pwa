@@ -1,0 +1,194 @@
+.adminDayOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 25, 35, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.adminDayCard {
+  width: min(92vw, 420px);
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 18px 40px rgba(15, 25, 35, 0.16);
+  color: #0f172a;
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.dayTitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dayCloseBtn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dayCloseBtn:hover {
+  background: #f8fafc;
+  color: #0c141d;
+}
+
+.dayNotice {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.dayError {
+  color: #ef4444;
+}
+
+.dayList {
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dayRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.dayRow:last-child {
+  border-bottom: none;
+}
+
+.dayLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dayAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(10, 133, 255, 0.12);
+  color: #0a85ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dayInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dayName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0c141d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dayStaffId {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dayRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.detailStatusPill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.detailHoliday {
+  background: rgba(227, 93, 91, 0.12);
+  color: #e35d5b;
+}
+
+.detailIncomplete {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+}
+
+.detailOff {
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+}
+
+.detailWorking {
+  background: rgba(10, 133, 255, 0.12);
+  color: #0a85ff;
+}
+
+.detailNoRecord {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 8px;
+  text-align: right;
+}
+
+.detailKey {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.detailVal {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0c141d;
+}
+
+.dayEmpty {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #94a3b8;
+}

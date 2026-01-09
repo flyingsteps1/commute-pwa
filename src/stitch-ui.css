@@ -1,0 +1,941 @@
+:root{
+  --bg:#f2f2f7;           /* iOS system background */
+  --surface:#ffffff;      /* card */
+  --border: color-mix(in srgb, #000 8%, transparent);
+  --text:#0b0b0f;
+  --muted:#8e8e93;        /* iOS secondary */
+  --primary:#0a84ff;      /* iOS blue */
+  --danger:#ff3b30;
+
+  --r-sm:12px;
+  --r-md:16px;
+  --r-lg:20px;
+
+  --shadow-soft: 0 2px 8px rgba(0,0,0,.04);
+  --shadow-cta: 0 10px 24px rgba(10,132,255,.18);
+}
+
+/* ===== base ===== */
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans KR", "Noto Sans JP", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iPhone safe area helpers */
+.safeTop{ padding-top: env(safe-area-inset-top); }
+.safeBottom{ padding-bottom: env(safe-area-inset-bottom); }
+
+/* page: iPhone width */
+.page{
+  max-width:420px;
+  margin:0 auto;
+  min-height:100dvh;
+  padding: 12px 18px 22px;
+}
+
+/* ===== Topbar (iOS-like) ===== */
+.topbar{
+  position: sticky;
+  top:0;
+  z-index:10;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px);
+  padding: 10px 0 10px;
+  border-bottom: 1px solid color-mix(in srgb, #000 6%, transparent);
+}
+
+.topbarRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.topbarTitle{
+  font-size:17px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:0;
+  text-transform:none;
+}
+
+/* icon button (back/chevron) */
+.iconBtn{
+  width:40px;
+  height:40px;
+  border:none;
+  border-radius:9999px;
+  background:transparent;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--text);
+}
+.iconBtn:hover{ background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.iconBtn:active{ transform: scale(.98); opacity:.9; }
+
+/* ===== headings ===== */
+.kicker{
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 6px 0 6px;
+  padding-left: 2px;
+}
+.h2{
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-0.02em;
+  margin: 0 0 8px;
+}
+.sub{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* ===== cards ===== */
+.card{
+  background:var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: var(--r-lg);
+  overflow:hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.listRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 14px 14px;
+  min-height: 72px;
+  border-bottom:1px solid color-mix(in srgb, #000 6%, transparent);
+}
+.listRow:last-child{ border-bottom:none; }
+
+.rowLeft{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+}
+
+.rowTitle{
+  font-size:17px;
+  font-weight:600;
+  color: var(--text);
+  line-height:1.1;
+}
+
+.rowMeta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:-0.01em;
+}
+
+.nowPill{
+  border:none;
+  height:36px;
+  min-width:72px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+}
+.nowPill:hover{ background: color-mix(in srgb, var(--primary) 18%, transparent); }
+.nowPill:active{ transform: scale(.98); opacity:.9; }
+
+/* break stepper */
+.stepper{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background: color-mix(in srgb, #000 6%, transparent);
+  border-radius: 12px;
+  padding: 6px;
+}
+.stepBtn{
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  border: 1px solid color-mix(in srgb, #000 10%, transparent);
+  background: var(--surface);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.stepBtn:active{ transform: scale(.97); }
+.stepVal{
+  width:44px;
+  text-align:center;
+  font-size:17px;
+  font-weight:800;
+}
+
+/* summary card (2 columns) */
+.summaryCard{
+  margin-top: 14px;
+  padding: 16px 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+.summary2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.summary2 > div{
+  flex:1;
+  text-align:center;
+  padding: 0 10px;
+}
+.summaryDivider{
+  width:1px;
+  height:42px;
+  background: color-mix(in srgb, #000 8%, transparent);
+}
+.sumLabel{
+  font-size:13px;
+  font-weight:600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sumBig{
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:-0.02em;
+}
+.sumMid{
+  font-size:20px;
+  font-weight:800;
+  color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+/* primary cta */
+.primaryBtn{
+  width:100%;
+  margin-top: 18px;
+  border:none;
+  border-radius: 16px;
+  background: var(--primary);
+  color:white;
+  font-weight:900;
+  font-size:17px;
+  padding: 16px 14px;
+  cursor:pointer;
+  box-shadow: var(--shadow-cta);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.primaryBtn:active{ transform: scale(.99); opacity:.95; }
+
+/* options section */
+.detailsWrap{
+  margin-top: 18px;
+  padding: 0 2px;
+}
+.detailsSummary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color: color-mix(in srgb, var(--text) 35%, transparent);
+  font-weight:600;
+  font-size:13px;
+  padding: 10px 10px;
+}
+
+/* ===== Monthly ===== */
+.monthRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin: 14px 0 14px;
+}
+
+.monthBtn{
+  border:none;
+  background:transparent;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  padding: 6px 2px;
+}
+.monthTitle{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-0.02em;
+}
+
+.pillBtn{
+  border:1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  background: color-mix(in srgb, var(--primary) 3%, transparent);
+  color: var(--primary);
+  font-size:13px;
+  font-weight:800;
+  padding: 7px 12px;
+  border-radius:9999px;
+  cursor:pointer;
+}
+.pillBtn:active{ opacity:.85; }
+
+.gridCard{
+  background: var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: var(--r-lg);
+  overflow:hidden;
+  box-shadow: var(--shadow-soft);
+}
+.grid2x2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+}
+.gridCell{
+  padding: 18px 14px;
+  text-align:center;
+  border-right:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-bottom:1px solid color-mix(in srgb, #000 6%, transparent);
+}
+.grid2x2 .gridCell:nth-child(2n){ border-right:none; }
+.grid2x2 .gridCell:nth-last-child(-n+2){ border-bottom:none; }
+
+.gridLabel{
+  font-size:13px;
+  font-weight:600;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.gridValue{
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:-0.02em;
+}
+
+.warnCard{
+  margin-top: 14px;
+  background: var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.warnTitle{ font-size:15px; font-weight:900; }
+.warnSub{ font-size:13px; color: var(--muted); margin-top: 4px; }
+.warnArrow{
+  width:34px; height:34px; border-radius:9999px;
+  display:flex; align-items:center; justify-content:center;
+  background: color-mix(in srgb, #000 5%, transparent);
+}
+
+/* incomplete highlight */
+.incompleteCell{
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+.incompleteCell .gridLabel{ color: color-mix(in srgb, var(--danger) 70%, var(--muted)); }
+.incompleteCell .gridValue{ color: var(--danger); }
+
+/* ===== Records ===== */
+.monthNav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top: 10px;
+}
+
+.navCircle{
+  width:40px; height:40px;
+  border-radius:9999px;
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  cursor:pointer;
+}
+.navCircle:active{ transform: scale(.98); }
+
+.statsCard{
+  margin-top: 12px;
+  background: var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  overflow:hidden;
+}
+.stat{
+  padding: 14px 10px;
+  text-align:center;
+  border-right:1px solid color-mix(in srgb, #000 6%, transparent);
+}
+.stat:last-child{ border-right:none; }
+.statK{ font-size:12px; font-weight:600; color: var(--muted); margin-bottom: 6px; }
+.statV{ font-size:20px; font-weight:900; }
+.statVPrimary{ color: var(--primary); }
+
+.tableBox{
+  margin-top: 14px;
+  background: var(--surface);
+  border:1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+  overflow:hidden;
+}
+.tHead, .tRow{
+  display:grid;
+  grid-template-columns: 1.3fr 2fr .9fr .9fr auto;
+  gap:10px;
+  align-items:center;
+  padding: 12px 14px;
+}
+.tHead{
+  background: color-mix(in srgb, #000 3%, transparent);
+  color: var(--muted);
+  font-size:12px;
+  font-weight:700;
+}
+.tRow{
+  border-top: 1px solid color-mix(in srgb, #000 6%, transparent);
+  font-size:13px;
+  min-height: 48px;
+}
+.small{ color:var(--muted); font-size:12px; }
+.strong{ font-weight:900; }
+
+.editIconBtn{
+  width:32px; height:32px;
+  border-radius:9999px;
+  border:none;
+  background:transparent;
+  color: color-mix(in srgb, var(--text) 35%, transparent);
+  cursor:pointer;
+}
+.editIconBtn:hover{ background: color-mix(in srgb, #000 5%, transparent); color: var(--primary); }
+.editIconBtn:active{ transform: scale(.98); }
+
+/* ===== AppShell tab bar ===== */
+.appRoot{ min-height:100dvh; display:flex; flex-direction:column; }
+.appMain{ flex:1; padding-bottom: 92px; }
+
+.tabBar{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: color-mix(in srgb, white 85%, transparent);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid color-mix(in srgb, #000 6%, transparent);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  z-index: 50;
+}
+.tabBarInner{
+  max-width: 420px;
+  margin: 0 auto;
+  height: 62px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding-bottom: 10px; /* home-indicator 느낌 */
+}
+.tab{
+  width: 110px;
+  height: 62px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border-radius: 16px;
+  color: color-mix(in srgb, var(--text) 35%, transparent);
+  text-decoration:none;
+}
+.tab:active{ opacity:.75; }
+.tabActive{ color: var(--primary); font-weight:900; }
+.tabIcon{ font-size: 26px; line-height:1; }
+.tabLabel{ font-size: 10px; font-weight:800; }
+
+/* ===== Calendar ===== */
+.calDowRow{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 14px;
+  padding: 0 2px;
+}
+.calDow{
+  text-align:center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.calGrid{
+  margin-top: 10px;
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calCell{
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+  min-height: 74px;
+  padding: 8px 8px 6px;
+  text-align:left;
+  cursor:pointer;
+}
+.calCell:active{ transform: scale(.99); opacity:.96; }
+.calEmpty{
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.calCellActive{
+  outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.calDay{
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text);
+}
+.calSun{ color: var(--danger); }
+.calSat{ color: color-mix(in srgb, var(--primary) 80%, var(--text)); }
+
+.calMini{
+  margin-top: 6px;
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+.calMiniLine{
+  font-size: 11px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+.calMiniBadge{
+  align-self:flex-start;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+}
+.calMiniBadge.ok{
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+.calMiniBadge.warn{
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+.calMiniMuted{
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ===== Bottom sheet ===== */
+.sheetWrap{
+  position: fixed;
+  left:0; right:0; bottom:0;
+  padding: 10px 14px calc(16px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, #000 22%, transparent);
+  backdrop-filter: blur(8px);
+  z-index: 60;
+}
+.sheet{
+  max-width: 420px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18);
+  padding: 12px 12px 14px;
+}
+.sheetHandle{
+  width: 44px;
+  height: 5px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, #000 12%, transparent);
+  margin: 0 auto 10px;
+}
+.sheetGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+.sheetItem{
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+  border-radius: 14px;
+  padding: 10px;
+  background: color-mix(in srgb, #000 2%, transparent);
+}
+.sheetK{
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.sheetV{
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* =========================
+   Calendar (Stitch style)
+========================= */
+
+.calPage{
+  padding-top: 10px;
+  padding-bottom: 24px;
+}
+
+.calTopTitle{
+  flex: 1;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.calMonthRow{
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+.calMonthNav{
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--text) 75%, transparent);
+  cursor: pointer;
+}
+.calMonthNav:active{ background: color-mix(in srgb, #000 6%, transparent); }
+
+.calMonthSelect{
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+.calMonthSelect:active{ opacity: .6; }
+
+.calMonthText{
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.calMonthChevron{
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.calCard{
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+  padding: 14px;
+}
+
+.calWeekHeader{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
+}
+
+.calWeekDay{
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
+}
+.calWeekDay.sun{ color: #E53935; }
+.calWeekDay.sat{ color: #66A3D2; }
+
+.calGrid2{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px 4px;
+}
+
+.calCell2{
+  border: none;
+  background: transparent;
+  padding: 8px 4px 6px;
+  border-radius: 14px;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: background .15s ease, transform .05s ease, box-shadow .15s ease;
+}
+.calCell2:hover{ background: #f8fafc; }
+.calCell2:active{ transform: scale(.98); }
+.calCell2.active{
+  background: #f1f5f9;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.calCellInactive{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calNum{
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+  margin-bottom: 4px;
+}
+.calNum.sun{ color: #E53935; }
+.calNum.sat{ color: #66A3D2; }
+
+.calNum.sel{
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,.10);
+}
+
+.calMiniTime{
+  font-size: 10px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
+  line-height: 1.1;
+  margin-bottom: 4px;
+  min-height: 12px;
+}
+
+.calBadge{
+  font-size: 9px;
+  font-weight: 900;
+  padding: 3px 6px;
+  border-radius: 8px;
+  line-height: 1;
+}
+.calBadge.ok{
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+.calBadge.bad{
+  color: #E53935;
+  background: color-mix(in srgb, #E53935 10%, transparent);
+}
+
+/* ===== Bottom Sheet (Stitch style) ===== */
+
+.sheetBackdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.40);
+  backdrop-filter: blur(2px);
+  z-index: 80;
+}
+
+.sheetDock{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+}
+
+.sheetPanel{
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.08);
+  padding: 10px 14px 14px;
+  animation: sheetUp .18s ease-out;
+}
+
+@keyframes sheetUp{
+  from{ transform: translateY(16px); opacity: .9; }
+  to{ transform: translateY(0); opacity: 1; }
+}
+
+.sheetHandle{
+  width: 46px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  margin: 2px auto 10px;
+}
+
+.sheetHeader{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 10px;
+}
+
+.sheetTitle{
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.sheetStatus{
+  display: flex;
+  justify-content: center;
+}
+
+.sheetPill{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.sheetPill.ok{
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+.sheetPill.warn{
+  color: #E53935;
+  background: color-mix(in srgb, #E53935 12%, transparent);
+}
+.sheetPill.muted{
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+  background: color-mix(in srgb, #000 6%, transparent);
+}
+
+.sheetCard{
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+  background: color-mix(in srgb, var(--bg) 55%, white);
+}
+
+.sheetRow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px;
+  border-bottom: 1px solid color-mix(in srgb, #000 6%, transparent);
+  background: transparent;
+}
+.sheetRow:last-child{ border-bottom: none; }
+.sheetRow.total{ background: white; }
+
+.sheetLeft{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sheetIcon{
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  display: grid;
+  place-items: center;
+}
+.sheetIcon .material-symbols-outlined{ font-size: 18px; }
+.sheetIcon.blue{ background: #dbeafe; color: var(--primary); }
+.sheetIcon.indigo{ background: #e0e7ff; color: #4f46e5; }
+.sheetIcon.orange{ background: #ffedd5; color: #f97316; }
+.sheetIcon.green{ background: #dcfce7; color: #16a34a; }
+
+.sheetKey{
+  font-size: 13px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
+}
+
+.sheetVal{
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.totalVal{
+  color: var(--primary);
+}
+
+.sheetActions{
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.sheetBtnPrimary{
+  width: 100%;
+  border: 1px solid color-mix(in srgb, #000 10%, transparent);
+  background: white;
+  border-radius: 14px;
+  padding: 12px 12px;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--primary);
+  cursor: pointer;
+}
+.sheetBtnPrimary:active{ transform: scale(.99); background: #f8fafc; }
+
+.sheetBtnGhost{
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+  cursor: pointer;
+}
+.sheetBtnGhost:active{ opacity: .7; }
+
+.sheetSafe{
+  height: env(safe-area-inset-bottom, 14px);
+}
