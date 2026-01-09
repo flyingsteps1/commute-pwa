@@ -261,26 +261,26 @@
   color: #e35d5b;
 }
 
-.staffSection {
+.adminMonthly .staffSection {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.staffHeader {
+.adminMonthly .staffHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 4px;
 }
 
-.staffTitle {
+.adminMonthly .staffTitle {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
 }
 
-.staffCount {
+.adminMonthly .staffCount {
   font-size: 12px;
   font-weight: 600;
   color: #94a3b8;
@@ -289,7 +289,7 @@
   padding: 4px 10px;
 }
 
-.staffCard {
+.adminMonthly .staffCard {
   background: #ffffff;
   border-radius: 18px;
   border: 1px solid #eef2f6;
@@ -418,13 +418,13 @@
   flex-shrink: 0;
 }
 
-.staffCalBtn:hover {
+.adminMonthly .staffCalBtn:hover {
   background: rgba(10, 133, 255, 0.1);
   color: #0a85ff;
   border-color: rgba(10, 133, 255, 0.4);
 }
 
-.staffCalBtn:disabled {
+.adminMonthly .staffCalBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   background: #f1f5f9;
