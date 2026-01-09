@@ -454,8 +454,10 @@
 }
 
 .adminMonthly .staffChips .chip {
-  flex: 1 1 0;
-  min-width: 0;
+  padding: 8px 14px;
+  line-height: 1.2;
+  flex: 0 1 auto;
+  min-width: fit-content;
 }
 
 .chipValue {
