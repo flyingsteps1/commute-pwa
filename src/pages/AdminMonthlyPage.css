@@ -396,7 +396,7 @@
 .adminMonthly .staffChips {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: nowrap;
   min-width: 0;
   flex: 1 1 auto;
@@ -454,11 +454,11 @@
 }
 
 .adminMonthly .staffChips .chip {
-  padding: 6px 8px;
+  padding: 8px 10px;
   line-height: 1.15;
   flex: 1 1 0;
   min-width: 0;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -469,26 +469,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.adminMonthly .staffChips .chipLabel {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.adminMonthly .staffChips .chipValue {
-  flex-shrink: 0;
-}
-
-@media (max-width: 390px) {
-  .adminMonthly .staffChips .chip {
-    padding: 6px 7px;
-  }
-  .adminMonthly .staffChips .chipLabel,
-  .adminMonthly .staffChips .chipValue {
-    font-size: 12px;
-    line-height: 1.1;
-  }
 }
 
 .chipValue {
