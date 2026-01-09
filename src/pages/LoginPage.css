@@ -1,5 +1,7 @@
 .loginRoot {
-  min-height: max(884px, 100dvh);
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   background: #f5f7f8;
   color: #333333;
   display: flex;
@@ -9,7 +11,7 @@
 .loginShell {
   width: 100%;
   max-width: 420px;
-  min-height: 100dvh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 18px;
@@ -388,4 +390,117 @@
   font-weight: 600;
   color: #9aa5b1;
   padding: 16px 0 24px;
+}
+
+@media (max-width: 420px) and (max-height: 760px) {
+  .ptSafe {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+
+  .pbSafe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .loginHeader {
+    gap: 32px;
+    padding-bottom: 28px;
+  }
+
+  .loginIconCard {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+  }
+
+  .loginIcon {
+    font-size: 36px;
+  }
+
+  .loginBrand {
+    gap: 6px;
+  }
+
+  .loginTitleWrap {
+    gap: 2px;
+  }
+
+  .loginTitle {
+    font-size: 26px;
+  }
+
+  .loginSubtitle {
+    font-size: 14px;
+  }
+
+  .langToggle {
+    padding: 3px;
+    border-radius: 10px;
+  }
+
+  .langPill {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .loginMain {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .loginCard {
+    padding: 18px;
+    border-radius: 20px;
+    gap: 14px;
+  }
+
+  .segmented {
+    padding: 4px;
+    border-radius: 14px;
+  }
+
+  .segButton {
+    height: 40px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+
+  .loginForm {
+    gap: 14px;
+  }
+
+  .formField {
+    gap: 6px;
+  }
+
+  .fieldLabel {
+    font-size: 13px;
+  }
+
+  .selectInput,
+  .textInput {
+    padding: 10px 40px 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+
+  .iconButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .primaryButton {
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 16px;
+  }
+
+  .helperLink {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .loginFooter {
+    font-size: 12px;
+    padding: 10px 0 16px;
+  }
 }
