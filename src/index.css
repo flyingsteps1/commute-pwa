@@ -197,6 +197,37 @@ input, textarea {
   color: color-mix(in srgb, var(--muted) 75%, transparent);
 }
 
+.calPage{
+  overflow-x: hidden;
+}
+
+.calPage .calCell2{
+  overflow: hidden;
+  justify-content: center;
+}
+
+.calPage .calCellDate{
+  line-height: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calPage .calCellMini{
+  line-height: 14px;
+  min-height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calPage .calCell2.sel .calCellMini{
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0);
+}
+
 .calBadge{
   font-size: 9px;
   font-weight: 900;
