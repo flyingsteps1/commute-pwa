@@ -118,7 +118,7 @@ export default function AdminCalendarModal(props: Props) {
 
   if (!staffProps) {
     return (
-      <div className="no-print adminCalendarOverlay" onClick={onClose}>
+      <div className="no-print adminCalendarOverlay isStaff" onClick={onClose}>
         <div className="adminCalendarCard" onClick={(e) => e.stopPropagation()}>
           <div className="calendarHeader">
             <div className="monthNav">

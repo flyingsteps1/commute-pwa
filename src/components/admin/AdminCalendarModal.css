@@ -10,6 +10,10 @@
   backdrop-filter: blur(6px);
 }
 
+.adminCalendarOverlay.isStaff {
+  background: rgba(15, 25, 35, 0.65);
+}
+
 .adminCalendarCard {
   width: min(92vw, 420px);
   max-width: 420px;
@@ -114,6 +118,10 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+.adminCalendarCard.isStaff .calendarBody {
+  padding-top: 4px;
 }
 
 .calendarLayout {
@@ -286,6 +294,16 @@
   word-break: keep-all;
   writing-mode: horizontal-tb;
   text-orientation: mixed;
+}
+
+.adminCalendarCard.isStaff .statusBadge {
+  height: 22px;
+  min-height: 22px;
+  padding: 0 8px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .statusBadge.statusOff {
