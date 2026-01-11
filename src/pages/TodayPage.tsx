@@ -248,27 +248,15 @@ export default function TodayPage() {
     if (minColRef.current) minColRef.current.scrollTop = minIdx * itemHeight;
   }, [pickerOpen, draftHour, draftMin, minuteSteps]);
 
-  function onBack() {
-    const q = sp.get("date");
-    if (q) {
-      nav("/calendar");
-      return;
-    }
-    history.back();
-  }
-
   return (
     <div className="screen">
-      <header className="app-bar">
-        <div className="header-left">
-          <button className="icon-button" type="button" aria-label={t("aria_back")} onClick={onBack}>
-            <span className="material-symbols-outlined">arrow_back_ios_new</span>
-          </button>
+      <header className="staffHeader">
+        <div className="staffHeaderLeft" aria-hidden="true" />
+        <div className="staffHeaderCenter">
+          <h1 className="staffHeaderTitle">{t("today_title")}</h1>
+          <p className="staffHeaderSub">{t("today_desc_default")}</p>
         </div>
-        <div className="header-center">
-          <h1 className="app-title">{t("today_title")}</h1>
-        </div>
-        <div className="header-right header-actions">
+        <div className="staffHeaderRight header-actions">
           <button
             className={`holiday-toggle-button ${isHoliday ? "active" : ""}`}
             type="button"
@@ -293,7 +281,6 @@ export default function TodayPage() {
         <div className="date-status-section">
           <div className="date-text-group">
             <h2 className="main-date">{formatTodayTitle(dateISO)}</h2>
-            <p className="sub-text">{t("today_desc_default")}</p>
           </div>
         </div>
 

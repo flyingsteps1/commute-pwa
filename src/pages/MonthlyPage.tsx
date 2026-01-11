@@ -190,13 +190,21 @@ export default function MonthlyPage() {
   return (
     <div className="staffMonthlyRoot" key={lang}>
       <main className="staffMonthlyShell">
+        <header className="staffHeader">
+          <div className="staffHeaderLeft" aria-hidden="true" />
+          <div className="staffHeaderCenter">
+            <h1 className="staffHeaderTitle">{t("staff_monthly_title")}</h1>
+            <p className="staffHeaderSub">{`${profileName} · ${selectedYear}.${selectedMonth}`}</p>
+          </div>
+          <div className="staffHeaderRight" />
+        </header>
+
         <header className="profileHeader">
           <div className="profileCard">
             <div className="profileLeft">
               <div className="profileAvatar">{profileName.charAt(0)}</div>
               <div className="profileText">
                 <h1 className="profileName">{profileName}</h1>
-                <p className="profileSub">월요약 · {selectedYear}년 {selectedMonth}월</p>
               </div>
             </div>
             <button className="profilePdfBtn" type="button" onClick={onPrint}>

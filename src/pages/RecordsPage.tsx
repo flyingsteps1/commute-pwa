@@ -114,9 +114,13 @@ export default function RecordsPage() {
   return (
     <div className="staffRecordsRoot">
       <div className="staffRecordsShell">
-        <header className="recordsHeader">
-          <h1 className="recordsTitle">{t("records_title")}</h1>
-          <p className="recordsSubtitle">{t("records_subtitle")}</p>
+        <header className="staffHeader">
+          <div className="staffHeaderLeft" aria-hidden="true" />
+          <div className="staffHeaderCenter">
+            <h1 className="staffHeaderTitle">{t("records_title")}</h1>
+            <p className="staffHeaderSub">{t("records_subtitle")}</p>
+          </div>
+          <div className="staffHeaderRight" />
         </header>
 
         <section className="monthCard" aria-label="month">
