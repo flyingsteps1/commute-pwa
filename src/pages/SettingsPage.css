@@ -299,6 +299,61 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 420px) {
+  .settingsCardHeader {
+    margin-bottom: 10px;
+  }
+
+  .settingsBadge {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .staffRow {
+    padding: 8px 0;
+    gap: 10px;
+  }
+
+  .staffRow:last-of-type {
+    margin-bottom: 12px;
+  }
+
+  .staffAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .staffName {
+    font-size: 15px;
+  }
+
+  .staffId {
+    font-size: 12px;
+  }
+
+  .staffActions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .settingsOutlineBtn {
+    padding: 4px 10px;
+    font-size: 12px;
+    min-height: 28px;
+  }
+
+  .settingsCardFooter {
+    margin-top: 12px;
+  }
+
+  .settingsPrimaryBtn {
+    min-height: 44px;
+    font-size: 15px;
+  }
+}
+
 .settingsHint {
   margin-top: 8px;
   font-size: 12px;
