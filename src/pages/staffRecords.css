@@ -186,6 +186,28 @@
   gap: 8px;
 }
 
+.recordsKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.recordsKpiGrid > * {
+  min-width: 0;
+}
+
+.recordsKpiItem {
+  width: 100%;
+  min-width: 0;
+}
+
+.recordsKpiLabel,
+.recordsKpiValue {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .kpiItem {
   display: flex;
   flex-direction: column;
@@ -227,13 +249,25 @@
 }
 
 @media (max-width: 360px) {
-  .kpiGrid {
+  .kpiGrid,
+  .recordsKpiGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
-  .kpiItem {
+  .kpiItem,
+  .recordsKpiItem {
     min-height: 84px;
+  }
+}
+
+@media (max-width: 420px) {
+  .recordsKpiLabel {
+    font-size: 9px;
+  }
+
+  .recordsKpiValue {
+    font-size: 14px;
   }
 }
 

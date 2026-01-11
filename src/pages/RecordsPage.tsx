@@ -154,23 +154,23 @@ export default function RecordsPage() {
           </button>
         </section>
 
-        <section className="kpiCard" aria-label="summary">
-          <div className="kpiGrid">
-            <div className="kpiItem">
-              <span className="kpiLabel">{t("records_stat_days")}</span>
-              <span className="kpiValue">{stats.days}</span>
+        <section className="kpiCard recordsKpiCard" aria-label="summary">
+          <div className="kpiGrid recordsKpiGrid">
+            <div className="kpiItem recordsKpiItem">
+              <span className="kpiLabel recordsKpiLabel">{t("records_stat_days")}</span>
+              <span className="kpiValue recordsKpiValue">{stats.days}</span>
             </div>
-            <div className="kpiItem">
-              <span className="kpiLabel">{t("records_stat_total")}</span>
-              <span className="kpiValue kpiValuePrimary">{minToHhmm(stats.totalWorkMin)}</span>
+            <div className="kpiItem recordsKpiItem">
+              <span className="kpiLabel recordsKpiLabel">{t("records_stat_total")}</span>
+              <span className="kpiValue kpiValuePrimary recordsKpiValue">{minToHhmm(stats.totalWorkMin)}</span>
             </div>
-            <div className="kpiItem">
-              <span className="kpiLabel">{t("records_stat_avg")}</span>
-              <span className="kpiValue">{stats.avgMin ? minToHhmm(stats.avgMin) : "0:00"}</span>
+            <div className="kpiItem recordsKpiItem">
+              <span className="kpiLabel recordsKpiLabel">{t("records_stat_avg")}</span>
+              <span className="kpiValue recordsKpiValue">{stats.avgMin ? minToHhmm(stats.avgMin) : "0:00"}</span>
             </div>
-            <div className="kpiItem">
-              <span className="kpiLabel">{t("records_stat_holiday")}</span>
-              <span className="kpiValue">{stats.holidayDays}</span>
+            <div className="kpiItem recordsKpiItem">
+              <span className="kpiLabel recordsKpiLabel">{t("records_stat_holiday")}</span>
+              <span className="kpiValue recordsKpiValue">{stats.holidayDays}</span>
             </div>
           </div>
         </section>
