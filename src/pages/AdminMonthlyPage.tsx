@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
 import type { WorkRecord } from "../domain/types";
+import { getWorkStatus } from "../domain/workStatus";
 import { useI18n } from "../i18n/I18nProvider";
 import { listStaffPublic } from "../storage/staffRepo";
 import { listByMonth } from "../storage/todayRepo";
@@ -35,6 +36,7 @@ export default function AdminMonthlyPage() {
   const [yyyyMm, setYyyyMm] = useState(currentMonthKey());
   const { t, lang } = useI18n();
   if (import.meta.env.DEV) console.log("[UI] AdminMonthlyPage rendered");
+  const todayISO = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const monthNavRef = useRef<HTMLDivElement | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -95,9 +97,10 @@ export default function AdminMonthlyPage() {
             const daily = calcDailyWorkMin(r);
             days += 1;
             totalBreakMin += daily.breakMin ?? 0;
-            if (daily.workMin === null) {
-              if (r.checkIn || r.checkOut) incompleteDays += 1;
-            } else {
+            const status = getWorkStatus(r, todayISO);
+            if (status === "incomplete") {
+              incompleteDays += 1;
+            } else if (daily.workMin !== null) {
               totalWorkMin += daily.workMin;
               completedDays += 1;
             }

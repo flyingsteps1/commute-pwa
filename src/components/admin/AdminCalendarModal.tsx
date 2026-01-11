@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { calcDailyWorkMin, minToHhmm } from "../../domain/timeCalc";
+import { getWorkStatus } from "../../domain/workStatus";
 import type { WorkRecord } from "../../domain/types";
 import { getMonthSummary, type MonthSummary } from "../../storage/adminCalendarRepo";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -108,11 +109,12 @@ export default function AdminCalendarModal(props: Props) {
   }
 
   const detailRecord = staffSelected ? recordMap.get(staffSelected) : undefined;
-  const detailIsOff = detailRecord?.note === "OFF";
+  const detailStatus = detailRecord ? getWorkStatus(detailRecord, todayISO) : "no_record";
+  const detailIsOff = detailStatus === "holiday";
+  const detailWorking = detailStatus === "working";
+  const detailIncomplete = detailStatus === "incomplete";
+  const detailComplete = detailStatus === "off";
   const detailDaily = detailRecord && !detailIsOff ? calcDailyWorkMin(detailRecord) : { workMin: null, breakMin: 0 };
-  const detailIncomplete =
-    !!detailRecord && !detailIsOff && detailDaily.workMin === null && (!!detailRecord.checkIn || !!detailRecord.checkOut);
-  const detailComplete = !!detailRecord && !detailIsOff && detailDaily.workMin !== null;
 
   if (!staffProps) {
     return (
@@ -236,7 +238,8 @@ export default function AdminCalendarModal(props: Props) {
           </div>
         )}
 
-        <div className="calendarLayout">
+        <div className="calendarBody">
+          <div className="calendarLayout">
           <div className="calendarPanel">
             <div className="dowRow">
               {DOW_LABELS.map((label, idx) => (
@@ -254,16 +257,27 @@ export default function AdminCalendarModal(props: Props) {
                 const isToday = cell.dateISO === todayISO;
                 const isSelected = cell.dateISO === staffSelected;
                 const record = cell.record;
-                const isOff = record?.note === "OFF";
-                const daily = record && !isOff ? calcDailyWorkMin(record) : { workMin: null, breakMin: 0 };
-                const isIncomplete =
-                  !!record && !isOff && daily.workMin === null && (!!record.checkIn || !!record.checkOut);
-                const statusLabel = isOff
-                  ? t("common_holiday")
-                  : isIncomplete
-                    ? t("common_incomplete")
-                    : t("common_off");
-                const statusClass = isOff ? "statusOff" : isIncomplete ? "statusIncomplete" : "statusComplete";
+                const status = record ? getWorkStatus(record, todayISO) : "no_record";
+                const statusLabel =
+                  status === "holiday"
+                    ? t("common_holiday")
+                    : status === "off"
+                      ? t("common_off")
+                      : status === "working"
+                        ? t("common_working")
+                        : status === "incomplete"
+                          ? t("common_incomplete")
+                          : "";
+                const statusClass =
+                  status === "holiday"
+                    ? "statusOff"
+                    : status === "off"
+                      ? "statusComplete"
+                      : status === "working"
+                        ? "statusWorking"
+                        : status === "incomplete"
+                          ? "statusIncomplete"
+                          : "statusNone";
                 return (
                   <button
                     key={`d-${cell.dateISO}`}
@@ -272,7 +286,7 @@ export default function AdminCalendarModal(props: Props) {
                     onClick={() => staffProps.onSelectDate(cell.dateISO)}
                   >
                     <span className="cellDay">{cell.dd}</span>
-                    {record && <span className={`statusBadge ${statusClass}`}>{statusLabel}</span>}
+                    {record && status !== "no_record" && <span className={`statusBadge ${statusClass}`}>{statusLabel}</span>}
                   </button>
                 );
               })}
@@ -297,9 +311,27 @@ export default function AdminCalendarModal(props: Props) {
                 <div className="detailEmpty">{t("common_holiday")} (OFF)</div>
               )}
 
+              {staffSelected && detailRecord && detailWorking && (
+                <>
+                  <div className="detailNote">{t("common_working")}</div>
+                  {detailRecord.checkIn && (
+                    <div className="detailRow">
+                      <span className="detailLabel">{t("common_check_in")}</span>
+                      <span className="detailValue">{detailRecord.checkIn}</span>
+                    </div>
+                  )}
+                  {detailRecord.breakMin !== undefined && (
+                    <div className="detailRow">
+                      <span className="detailLabel">{t("today_label_break")}</span>
+                      <span className="detailValue">{minToHhmm(detailRecord.breakMin ?? 0)}</span>
+                    </div>
+                  )}
+                </>
+              )}
+
               {staffSelected && detailRecord && detailIncomplete && (
                 <>
-                  <div className="detailNote">미완료(체크인/체크아웃 누락)</div>
+                  <div className="detailNote">미완료(체크아웃 누락)</div>
                   {detailRecord.checkIn && (
                     <div className="detailRow">
                       <span className="detailLabel">{t("common_check_in")}</span>
@@ -346,5 +378,8 @@ export default function AdminCalendarModal(props: Props) {
         </div>
       </div>
     </div>
+    </div>
   );
 }
+
+

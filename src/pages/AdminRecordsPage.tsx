@@ -4,6 +4,7 @@ import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
 import { useI18n } from "../i18n/I18nProvider";
 import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
+import { getWorkStatus } from "../domain/workStatus";
 import PageHeader from "../components/PageHeader";
 import "./AdminRecordsPage.css";
 
@@ -15,12 +16,11 @@ type TodayStatus = {
   detailKind?: "check_in" | "check_out";
 };
 
-function deriveStatus(r?: any): TodayStatus {
-  if (!r) return { code: "no_record" };
-  if (r.note === "OFF") return { code: "holiday" };
-  if (r.checkIn && r.checkOut) return { code: "off", detailTime: toHHMM(r.checkOut), detailKind: "check_out" };
-  if (r.checkIn) return { code: "incomplete", detailTime: toHHMM(r.checkIn), detailKind: "check_in" };
-  return { code: "no_record" };
+function deriveStatus(r: any | undefined, todayISO: string): TodayStatus {
+  const code = getWorkStatus(r, todayISO);
+  if (code === "off") return { code, detailTime: toHHMM(r?.checkOut), detailKind: "check_out" };
+  if (code === "working" || code === "incomplete") return { code, detailTime: toHHMM(r?.checkIn), detailKind: "check_in" };
+  return { code };
 }
 
 function toHHMM(ts?: string | null) {
@@ -83,28 +83,28 @@ export default function AdminRecordsPage() {
 
   const rows = staff.map((s) => {
     const rec = records.find((r) => r.staff_user_id && s.userId && r.staff_user_id === s.userId);
-    const status = deriveStatus(rec);
+    const status = deriveStatus(rec, todayKey);
     return { ...s, status };
   });
 
   const filteredRows = rows.filter((r) => {
     if (filter === "all") return true;
-    if (filter === "work") return r.status.code === "off";
+    if (filter === "work") return r.status.code === "off" || r.status.code === "working";
     if (filter === "incomplete") return r.status.code === "incomplete";
     if (filter === "holiday") return r.status.code === "holiday";
     return true;
   });
 
   const summary = useMemo(() => {
-    let offCount = 0;
+    let workCount = 0;
     let incompleteCount = 0;
     let holidayCount = 0;
     for (const r of rows) {
-      if (r.status.code === "off") offCount++;
+      if (r.status.code === "off" || r.status.code === "working") workCount++;
       else if (r.status.code === "incomplete") incompleteCount++;
       else if (r.status.code === "holiday") holidayCount++;
     }
-    return { offCount, incompleteCount, holidayCount };
+    return { workCount, incompleteCount, holidayCount };
   }, [rows]);
 
   return (
@@ -119,7 +119,7 @@ export default function AdminRecordsPage() {
         <main className="recordsMain">
           <section aria-label="Summary Statistics">
             <div className="kpiGrid">
-              <SummaryCard label={t("records_filter_work")} value={summary.offCount} />
+              <SummaryCard label={t("records_filter_work")} value={summary.workCount} />
               <SummaryCard label={t("records_filter_incomplete")} value={summary.incompleteCount} />
               <SummaryCard label={t("records_filter_holiday")} value={summary.holidayCount} />
             </div>
@@ -148,6 +148,9 @@ export default function AdminRecordsPage() {
                 const badge = (() => {
                   if (r.status.code === "holiday") {
                     return { text: t("common_holiday"), className: "staffBadge--off" };
+                  }
+                  if (r.status.code === "working") {
+                    return { text: t("common_working"), className: "staffBadge--working" };
                   }
                   if (r.status.code === "incomplete") {
                     return { text: t("common_incomplete"), className: "staffBadge--incomplete" };

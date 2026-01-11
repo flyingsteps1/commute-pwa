@@ -4,6 +4,7 @@ import { useI18n } from "../i18n/I18nProvider";
 import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
 import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
+import { getWorkStatus } from "../domain/workStatus";
 import AdminCalendarModal from "../components/admin/AdminCalendarModal";
 import AdminDayDetailModal from "../components/admin/AdminDayDetailModal";
 import PageHeader from "../components/PageHeader";
@@ -28,14 +29,15 @@ function hhmmFromTimestamp(ts?: string | null) {
   return ts.slice(11, 16);
 }
 
-function statusFromRecord(r?: any): TodayStatus {
-  if (!r) return { code: "no_record" };
-  if (r.note === "OFF") return { code: "holiday" };
-  const checkIn = r.checkIn;
-  const checkOut = r.checkOut;
-  if (checkIn && checkOut) return { code: "off", detailTime: hhmmFromTimestamp(checkOut), detailKind: "check_out" };
-  if (checkIn && !checkOut) return { code: "working", detailTime: hhmmFromTimestamp(checkIn), detailKind: "check_in" };
-  return { code: "no_record" };
+function statusFromRecord(r: any | undefined, todayISO: string): TodayStatus {
+  const code = getWorkStatus(r, todayISO);
+  if (code === "off") {
+    return { code, detailTime: hhmmFromTimestamp(r?.checkOut), detailKind: "check_out" };
+  }
+  if (code === "working" || code === "incomplete") {
+    return { code, detailTime: hhmmFromTimestamp(r?.checkIn), detailKind: "check_in" };
+  }
+  return { code };
 }
 
 export default function AdminDashboardPage() {
@@ -85,7 +87,7 @@ export default function AdminDashboardPage() {
 
   const statuses = staff.map((s) => {
     const rec = records.find((r) => r.staff_user_id && s.userId && r.staff_user_id === s.userId);
-    return { ...s, status: statusFromRecord(rec) };
+    return { ...s, status: statusFromRecord(rec, todayKey) };
   });
 
   const summary = useMemo(() => {
