@@ -130,7 +130,8 @@ export default function AdminStaffDetailPage() {
                 : "stNone";
         const checkIn = isHoliday ? dash : r?.checkIn ?? dash;
         const checkOut = isHoliday ? dash : r?.checkOut ?? dash;
-        const breakMin = isHoliday ? dash : String(r?.breakMin ?? 0);
+        // Checklist: A) normal day -> "00:30"/"01:00", B) incomplete -> matches records, C) holiday -> unchanged dash.
+        const breakMin = isHoliday ? dash : minToHhmm(r?.breakMin ?? 0);
         const workText = isHoliday ? dash : daily.workMin === null ? dash : minToHhmm(daily.workMin);
         return `
           <tr>
