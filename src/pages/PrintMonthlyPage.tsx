@@ -28,6 +28,19 @@ function formatMDWithDow(yyyy: number, mm1: number, dd: number, dows: string[]) 
   return `${mm1}/${dd}(${dow})`;
 }
 
+function normalizeTime(value: any): string {
+  if (!value) return "";
+  if (typeof value === "string") {
+    if (/^\d{2}:\d{2}$/.test(value)) return value;
+    if (value.includes("T")) return value.slice(11, 16);
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value)) return value.slice(11, 16);
+    if (/^\d{2}:\d{2}:\d{2}$/.test(value)) return value.slice(0, 5);
+    if (value.length >= 5) return value.slice(0, 5);
+    return "—";
+  }
+  return "—";
+}
+
 export default function PrintMonthlyPage() {
   const { t, lang } = useI18n();
   const DOW = lang === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : ["일", "월", "화", "수", "목", "금", "토"];
@@ -85,8 +98,8 @@ export default function PrintMonthlyPage() {
       return {
         dateISO,
         label,
-        checkIn: isHoliday ? "" : r?.checkIn ?? "",
-        checkOut: isHoliday ? "" : r?.checkOut ?? "",
+        checkIn: isHoliday ? "" : normalizeTime(r?.checkIn),
+        checkOut: isHoliday ? "" : normalizeTime(r?.checkOut),
         breakMin,
         workMin,
         overtimeMin,

@@ -1,10 +1,12 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
+import { calcDailyWorkMin, calcMonthlySummary, minToHhmm } from "../domain/timeCalc";
 import type { WorkRecord } from "../domain/types";
 import { getSession } from "../auth/session";
 import { activeEmployeeId } from "../auth/identity";
 import { listStaff } from "../auth/store";
 import { supabase } from "../storage/supabaseClient";
+
+const PRINT_BUILD_STAMP = "PRINT_BUILD_STAMP_20260111_001";
 
 function detectLang(): "ko" | "ja" {
   try {
@@ -56,32 +58,31 @@ function parseQuery() {
   const params = new URLSearchParams(window.location.search);
   const m = params.get("month");
   const employeeId = params.get("employeeId");
+  const debug = params.get("debug");
   return {
     month: m && /^\d{4}-\d{2}$/.test(m) ? m : null,
     employeeId: employeeId || null,
+    debug: debug === "1",
   };
 }
 
 const JP_DOW = ["日", "月", "火", "水", "木", "金", "土"];
 
 function toHHMM(v: any): string | null {
-  if (!v) return null;
-  if (typeof v === "string") {
-    if (/^\d{2}:\d{2}$/.test(v)) return v;
-    const d = new Date(v);
-    if (!Number.isNaN(d.getTime())) {
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
-      return `${hh}:${mm}`;
-    }
-    return null;
+  return normalizeTime(v);
+}
+
+function normalizeTime(value: any): string | null {
+  if (!value) return null;
+  if (typeof value === "string") {
+    if (/^\d{2}:\d{2}$/.test(value)) return value;
+    if (value.includes("T")) return value.slice(11, 16);
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value)) return value.slice(11, 16);
+    if (/^\d{2}:\d{2}:\d{2}$/.test(value)) return value.slice(0, 5);
+    if (value.length >= 5) return value.slice(0, 5);
+    return "—";
   }
-  if (v instanceof Date) {
-    const hh = String(v.getHours()).padStart(2, "0");
-    const mm = String(v.getMinutes()).padStart(2, "0");
-    return `${hh}:${mm}`;
-  }
-  return null;
+  return "—";
 }
 
 function daysInMonth(yyyy: number, mm1: number) {
@@ -241,13 +242,14 @@ export default function PrintPage() {
 
     return lang === "ja" ? ja : ko;
   }, [lang]);
-  const { month, employeeId: queryEmployee } = useMemo(() => parseQuery(), []);
+  const { month, employeeId: queryEmployee, debug } = useMemo(() => parseQuery(), []);
   const yyyyMm = useMemo(() => month ?? currentMonthKey(), [month]);
   const session = getSession();
   const sessionEmployeeId = activeEmployeeId(session);
   const employeeId = queryEmployee || sessionEmployeeId;
 
   const [records, setRecords] = useState<WorkRecord[]>([]);
+  const [rawRecords, setRawRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [staffName, setStaffName] = useState<string | null>(null);
@@ -260,10 +262,11 @@ export default function PrintPage() {
       setError(null);
       try {
         const { rows, breakColUsed } = await fetchRecordsByMonth(employeeId, yyyyMm);
+        if (!cancelled) setRawRecords(rows ?? []);
         const mapped = (rows ?? []).map((r: any) => ({
           date: r.date,
-          checkIn: toHHMM(r.check_in),
-          checkOut: toHHMM(r.check_out),
+          checkIn: normalizeTime(r.check_in),
+          checkOut: normalizeTime(r.check_out),
           breakMin: breakColUsed ? Number(r?.[breakColUsed] ?? 0) : Number(r?.break_minutes ?? 0),
           note: r.note ?? null,
         })) as any as WorkRecord[];
@@ -396,6 +399,79 @@ export default function PrintPage() {
     };
   }, [yyyyMm, records]);
 
+  const debugDump = useMemo(() => {
+    if (!debug) return "";
+    const [yyyy, mm1] = yyyyMm.split("-").map(Number);
+    const startDate = `${yyyyMm}-01`;
+    const next = new Date(yyyy, mm1, 1);
+    const endDate = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-01`;
+    const recordDates = records.map((r) => r.date).sort();
+    const summaryFromCalc = calcMonthlySummary(records, yyyyMm);
+    const sampleRaw = rawRecords.slice(0, 5);
+    const sampleNormalized = sampleRaw.map((r: any) => ({
+      date: r.date,
+      check_in_raw: r.check_in,
+      check_out_raw: r.check_out,
+      check_in_norm: normalizeTime(r.check_in),
+      check_out_norm: normalizeTime(r.check_out),
+      note: r.note ?? null,
+    }));
+    const lines: string[] = [];
+    lines.push("== PRINT DEBUG ==");
+    lines.push(`[A] url=${window.location.href}`);
+    lines.push(`[A] month-range: yyyyMm=${yyyyMm}, start=${startDate}, end=${endDate}`);
+    lines.push(`[A] timezone: offsetMin=${new Date().getTimezoneOffset()}, now=${new Date().toISOString()}`);
+    lines.push(`[B] records: count=${records.length}, dates=[${recordDates.join(", ")}]`);
+    lines.push(`[B] raw-records-sample(5): ${JSON.stringify(sampleRaw, null, 2)}`);
+    lines.push(`[B] normalized-sample(5): ${JSON.stringify(sampleNormalized, null, 2)}`);
+    lines.push(`[B] days: count=${model.rows.length}, dates=[${model.rows.map((r) => r.dateISO).join(", ")}]`);
+    lines.push("[C] daily:");
+    for (const row of model.rows) {
+      const r = records.find((x) => x.date === row.dateISO);
+      const isHoliday = r?.note === "OFF";
+      const daily = r && !isHoliday ? calcDailyWorkMin(r) : { workMin: null, breakMin: 0 };
+      lines.push(
+        [
+          row.dateISO,
+          `record=${r ? "Y" : "N"}`,
+          `holiday=${isHoliday ? "Y" : "N"}`,
+          `in=${r?.checkIn ?? "-"}`,
+          `out=${r?.checkOut ?? "-"}`,
+          `breakMin=${r?.breakMin ?? "-"}`,
+          `daily.workMin=${daily.workMin ?? "-"}`,
+          `daily.breakMin=${daily.breakMin ?? "-"}`,
+          `workText=${row.workText}`,
+          `breakText=${row.breakText}`,
+        ].join(" | ")
+      );
+    }
+    lines.push("[D] summary:");
+    lines.push(
+      [
+        `calcMonthlySummary.totalWorkMin=${summaryFromCalc.totalWork}`,
+        `calcMonthlySummary.totalBreakMin=${summaryFromCalc.totalBreak}`,
+        `calcMonthlySummary.workDays=${summaryFromCalc.workDays}`,
+        `calcMonthlySummary.incompleteDays=${summaryFromCalc.incompleteDays}`,
+      ].join(" | ")
+    );
+    lines.push(
+      [
+        `print.summary.totalWorkMin=${model.summary.totalWorkMin}`,
+        `print.summary.totalBreakMin=${model.summary.totalBreakMin}`,
+        `print.summary.workDays=${model.summary.workDays}`,
+        `print.summary.incompleteDays=${model.summary.incompleteDays}`,
+        `print.summary.offDays=${model.summary.offDays}`,
+      ].join(" | ")
+    );
+    lines.push(
+      [
+        `print.summary.totalWork(hhmm)=${minToHhmm(model.summary.totalWorkMin)}`,
+        `print.summary.totalBreak(hhmm)=${minToHhmm(model.summary.totalBreakMin)}`,
+      ].join(" | ")
+    );
+    return lines.join("\n");
+  }, [debug, yyyyMm, records, model.rows, model.summary]);
+
   const monthTitle =
     lang === "ja"
       ? `${model.yyyy}年 ${String(model.mm1).padStart(2, "0")}月`
@@ -468,6 +544,17 @@ export default function PrintPage() {
           font-size: 10px;
           color: #94a3b8;
           font-weight: 700;
+        }
+        .printPage .debugDump{
+          margin-top: 12px;
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
+          font-size: 11px;
+          line-height: 1.4;
+          white-space: pre-wrap;
+          word-break: break-word;
         }
         .printPage .kpiGrid{
           display:grid;
@@ -641,10 +728,10 @@ export default function PrintPage() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>{employeeLine}</div>
               )}
             </div>
-            <div className="headRight">
-              <div className="monthBadge">{monthTitle}</div>
-              <div className="versionStamp">PRINT_KPI_VER_20260109_01</div>
-            </div>
+          <div className="headRight">
+            <div className="monthBadge">{monthTitle}</div>
+            <div className="versionStamp">{PRINT_BUILD_STAMP}</div>
+          </div>
           </div>
 
           <div className="summary kpiGrid">
@@ -706,6 +793,9 @@ export default function PrintPage() {
               ))}
             </tbody>
           </table>
+          {debug && (
+            <pre className="debugDump no-print">{debugDump}</pre>
+          )}
         </div>
       </div>
     </div>
