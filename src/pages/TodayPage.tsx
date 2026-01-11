@@ -169,10 +169,21 @@ export default function TodayPage() {
     }
   }
 
-  function onNowCheckIn() {
+  async function onNowCheckIn() {
     const now = nowHHMM();
     setCheckIn(now);
     setErrorMsg(null);
+    try {
+      await upsertMyTodayRecord({
+        date: dateISO,
+        checkIn: now,
+        checkOut: checkOut ?? undefined,
+        breakMin: breakMinutes,
+        note: null,
+      });
+    } catch (e: any) {
+      setErrorMsg(e?.message ?? "출근 및 퇴근 시간을 올바르게 입력해주세요.");
+    }
   }
 
   function onNowCheckOut() {
