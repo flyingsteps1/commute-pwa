@@ -726,7 +726,7 @@ export default function PrintPage() {
             </div>
           <div className="headRight">
             <div className="monthBadge">{monthTitle}</div>
-            <div className="versionStamp">{PRINT_BUILD_STAMP}</div>
+            {debug && <div className="versionStamp">{PRINT_BUILD_STAMP}</div>}
           </div>
           </div>
 
