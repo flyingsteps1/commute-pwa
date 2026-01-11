@@ -79,7 +79,7 @@ export default function TodayPage() {
 
   const minuteSteps = useMemo(() => Array.from({ length: 12 }, (_, i) => i * 5), []);
   const hourSteps = useMemo(() => Array.from({ length: 24 }, (_, i) => i), []);
-  const itemHeight = 36;
+  const itemHeight = 40;
 
   useEffect(() => {
     let cancelled = false;
