@@ -53,6 +53,7 @@ export default function TodayPage() {
   const nav = useNavigate();
   const [sp] = useSearchParams();
   const { t } = useI18n();
+  const debug = new URLSearchParams(window.location.search).get("debug") === "1";
 
   const dateISO = useMemo(() => {
     const q = sp.get("date");
@@ -264,6 +265,11 @@ export default function TodayPage() {
       </header>
 
       <main className="content-area">
+        {debug && (
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#64748b", padding: "6px 16px" }}>
+            BUILD: EDFA927__20260111
+          </div>
+        )}
         <div className="date-status-section">
           <div className="date-text-group">
             <h2 className="main-date">{formatTodayTitle(dateISO)}</h2>
