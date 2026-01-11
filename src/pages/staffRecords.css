@@ -188,17 +188,27 @@
 
 .recordsKpiGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .recordsKpiGrid > * {
   min-width: 0;
 }
 
+.recordsKpiCard {
+  padding: 12px;
+  box-sizing: border-box;
+}
+
 .recordsKpiItem {
   width: 100%;
   min-width: 0;
+  padding: 10px 6px;
+  border-radius: 14px;
+  box-sizing: border-box;
 }
 
 .recordsKpiLabel,
@@ -206,6 +216,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .kpiItem {
