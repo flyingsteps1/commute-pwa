@@ -187,9 +187,9 @@
 }
 
 .recordsKpiGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -207,8 +207,9 @@
 }
 
 .recordsKpiItem {
-  width: 100%;
-  min-width: 0;
+  width: auto !important;
+  min-width: 0 !important;
+  flex: none !important;
   padding: 10px 6px;
   border-radius: 14px;
   box-sizing: border-box;
@@ -220,6 +221,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+
+.buildStamp {
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+  padding: 6px 16px;
 }
 
 .kpiItem {

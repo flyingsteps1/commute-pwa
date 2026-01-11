@@ -41,6 +41,7 @@ function formatDateBlock(dateISO: string) {
 export default function RecordsPage() {
   const nav = useNavigate();
   const { t } = useI18n();
+  const debug = new URLSearchParams(window.location.search).get("debug") === "1";
   const [yyyyMm, setYyyyMm] = useState(currentMonthKey());
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [pickerYear, setPickerYear] = useState<number>(() => Number(currentMonthKey().split("-")[0]));
@@ -114,6 +115,7 @@ export default function RecordsPage() {
   return (
     <div className="staffRecordsRoot">
       <div className="staffRecordsShell">
+        {debug && <div className="buildStamp">BUILD: RECORDS_20260111_001</div>}
         <header className="staffHeader">
           <div className="staffHeaderLeft" aria-hidden="true" />
           <div className="staffHeaderCenter">
