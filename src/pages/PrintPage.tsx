@@ -68,10 +68,6 @@ function parseQuery() {
 
 const JP_DOW = ["日", "月", "火", "水", "木", "金", "土"];
 
-function toHHMM(v: any): string | null {
-  return normalizeTime(v);
-}
-
 function normalizeTime(value: any): string | null {
   if (!value) return null;
   if (typeof value === "string") {
