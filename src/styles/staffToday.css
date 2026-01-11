@@ -13,6 +13,7 @@
   --radius-medium: 12px;
   --radius-small: 8px;
   --tabbar-h: 82px;
+  --bottom-nav-h: 64px;
   --savebar-h: 52px;
   --gap-fixed: 12px;
   --safe-b: env(safe-area-inset-bottom);
@@ -617,8 +618,8 @@ body {
 @media (max-width: 420px) {
   .today-actions {
     position: sticky;
-    bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--gap-fixed));
-    padding-bottom: calc(var(--safe-b) + var(--gap-fixed));
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--gap-fixed));
     z-index: 1200;
   }
 
@@ -629,5 +630,9 @@ body {
     transform: none;
     width: 100%;
     padding: 0 16px;
+  }
+
+  .content-area {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 120px);
   }
 }
