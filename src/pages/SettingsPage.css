@@ -432,6 +432,21 @@
   color: #ffffff;
 }
 
+@media (max-width: 420px) {
+  .staffPwEdit {
+    margin-left: 0;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .staffPwEditActions {
+    flex-direction: column;
+  }
+
+  .staffPwEditBtn {
+    min-height: 40px;
+  }
+}
+
 .settingsError {
   color: #ef4444;
   font-size: 13px;
