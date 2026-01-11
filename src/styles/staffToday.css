@@ -327,6 +327,12 @@ body {
   justify-content: center;
 }
 
+.today-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .holiday-cta {
   height: var(--savebar-h);
   border-radius: var(--radius-button-square);
@@ -605,4 +611,22 @@ body {
 .timepicker-btn.primary {
   background: var(--primary-blue);
   color: #ffffff;
+}
+
+@media (max-width: 420px) {
+  .today-actions {
+    position: sticky;
+    bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--gap-fixed));
+    padding-bottom: calc(var(--safe-b) + var(--gap-fixed));
+    z-index: 1200;
+  }
+
+  .savebar {
+    position: static;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: 100%;
+    padding: 0 16px;
+  }
 }

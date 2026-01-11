@@ -326,14 +326,25 @@ export default function TodayPage() {
           </div>
         </div>
 
-        <button
-          className={`holiday-cta holiday-cta-inline ${isHoliday ? "active" : ""}`}
-          type="button"
-          onClick={onToggleHoliday}
-          disabled={saving}
-        >
-          {isHoliday ? "휴무 해제" : "휴무로 설정"}
-        </button>
+        <div className="today-actions">
+          <button
+            className={`holiday-cta holiday-cta-inline ${isHoliday ? "active" : ""}`}
+            type="button"
+            onClick={onToggleHoliday}
+            disabled={saving}
+          >
+            {isHoliday ? "휴무 해제" : "휴무로 설정"}
+          </button>
+
+          <div className="savebar" role="presentation">
+            <button className="primary-cta-button" type="button" onClick={handleSave} disabled={saving || !canSave}>
+              <span className={saving ? "hidden" : ""}>
+                {isHoliday ? "휴무 저장하기" : t("today_btn_save")}
+              </span>
+              <div className={`spinner ${saving ? "visible" : ""}`} />
+            </button>
+          </div>
+        </div>
 
         <p className={`error-message-block ${errorMsg ? "visible" : ""}`}>{errorMsg}</p>
 
@@ -353,15 +364,6 @@ export default function TodayPage() {
           </div>
         </div>
       </main>
-
-      <div className="savebar" role="presentation">
-        <button className="primary-cta-button" type="button" onClick={handleSave} disabled={saving || !canSave}>
-          <span className={saving ? "hidden" : ""}>
-            {isHoliday ? "휴무 저장하기" : t("today_btn_save")}
-          </span>
-          <div className={`spinner ${saving ? "visible" : ""}`} />
-        </button>
-      </div>
 
       <div className={`toast-message ${toastVisible ? "visible" : ""}`} id="save-success-toast">
         기록이 성공적으로 저장되었습니다!
