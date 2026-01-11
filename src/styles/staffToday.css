@@ -71,6 +71,11 @@ body {
   justify-content: center;
 }
 
+.header-actions {
+  width: auto;
+  gap: 8px;
+}
+
 .header-right .icon-button,
 .header-left .icon-button {
   background: none;

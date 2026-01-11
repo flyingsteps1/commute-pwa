@@ -187,10 +187,21 @@ export default function TodayPage() {
     }
   }
 
-  function onNowCheckOut() {
+  async function onNowCheckOut() {
     const now = nowHHMM();
     setCheckOut(now);
     setErrorMsg(null);
+    try {
+      await upsertMyTodayRecord({
+        date: dateISO,
+        checkIn: checkIn ?? undefined,
+        checkOut: now,
+        breakMin: breakMinutes,
+        note: null,
+      });
+    } catch (e: any) {
+      setErrorMsg(e?.message ?? "출근 및 퇴근 시간을 올바르게 입력해주세요.");
+    }
   }
 
   function decBreak() {
@@ -257,7 +268,16 @@ export default function TodayPage() {
         <div className="header-center">
           <h1 className="app-title">{t("today_title")}</h1>
         </div>
-        <div className="header-right">
+        <div className="header-right header-actions">
+          <button
+            className={`holiday-toggle-button ${isHoliday ? "active" : ""}`}
+            type="button"
+            onClick={onToggleHoliday}
+            disabled={saving}
+            aria-pressed={isHoliday}
+          >
+            휴무
+          </button>
           <button className="icon-button" type="button" aria-label={t("aria_calendar")} onClick={() => nav("/calendar")}>
             <span className="material-symbols-outlined">calendar_month</span>
           </button>
@@ -293,7 +313,7 @@ export default function TodayPage() {
               {isHoliday ? "--:--" : checkIn ?? "--:--"}
             </button>
             <button className="now-button" type="button" onClick={onNowCheckIn} disabled={isHoliday || saving}>
-              {t("today_btn_now")}
+              출근
             </button>
           </div>
           <div className={`input-row ${isHoliday ? "disabled" : ""}`}>
@@ -311,7 +331,7 @@ export default function TodayPage() {
               {isHoliday ? "--:--" : checkOut ?? "--:--"}
             </button>
             <button className="now-button" type="button" onClick={onNowCheckOut} disabled={isHoliday || saving}>
-              {t("today_btn_now")}
+              퇴근
             </button>
           </div>
           <div className={`input-row ${isHoliday ? "disabled" : ""}`}>
@@ -344,15 +364,6 @@ export default function TodayPage() {
         </div>
 
         <div className="today-actions">
-          <button
-            className={`holiday-cta holiday-cta-inline ${isHoliday ? "active" : ""}`}
-            type="button"
-            onClick={onToggleHoliday}
-            disabled={saving}
-          >
-            {isHoliday ? "휴무 해제" : "휴무로 설정"}
-          </button>
-
           <div className="savebar" role="presentation">
             <button className="primary-cta-button" type="button" onClick={handleSave} disabled={saving || !canSave}>
               <span className={saving ? "hidden" : ""}>
