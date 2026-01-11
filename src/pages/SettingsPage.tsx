@@ -672,7 +672,7 @@ export default function SettingsPage() {
             </section>
           )}
 
-          <section className="settingsCard">
+          <section className="settingsCard settingsAdminPwCard">
             <div className="settingsAdminHeader">
               <span className="material-symbols-outlined">shield</span>
               <span className="settingsAdminCaption">ADMIN</span>
@@ -718,9 +718,11 @@ export default function SettingsPage() {
               {adminErr && <div className="settingsError">{adminErr}</div>}
               {adminMsg && <div className="settingsSuccess">{adminMsg}</div>}
 
-              <button className="settingsPrimaryBtn" type="submit">
-                {t("settings_admin_password_submit")}
-              </button>
+              <div className="settingsAdminPwActions">
+                <button className="settingsPrimaryBtn" type="submit">
+                  {t("settings_admin_password_submit")}
+                </button>
+              </div>
             </form>
           </section>
 

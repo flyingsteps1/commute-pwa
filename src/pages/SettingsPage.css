@@ -352,6 +352,30 @@
     min-height: 44px;
     font-size: 15px;
   }
+
+  .staffPwEdit {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  .staffPwEditActions {
+    position: sticky;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    background: #ffffff;
+    padding: 8px 0;
+    z-index: 2;
+  }
+
+  .settingsAdminPwCard {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  .settingsAdminPwActions {
+    position: sticky;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    background: #ffffff;
+    padding-top: 8px;
+    z-index: 2;
+  }
 }
 
 .settingsHint {
