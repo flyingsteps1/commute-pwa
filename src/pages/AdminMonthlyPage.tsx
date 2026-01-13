@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
 import type { WorkRecord } from "../domain/types";
 import { getWorkStatus } from "../domain/workStatus";
@@ -33,6 +33,7 @@ type StaffRow = {
 
 export default function AdminMonthlyPage() {
   const nav = useNavigate();
+  const location = useLocation();
   const [yyyyMm, setYyyyMm] = useState(currentMonthKey());
   const { t, lang } = useI18n();
   if (import.meta.env.DEV) console.log("[UI] AdminMonthlyPage rendered");
@@ -46,6 +47,7 @@ export default function AdminMonthlyPage() {
   const [calendarLoading, setCalendarLoading] = useState(false);
   const [calendarError, setCalendarError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const deepLinkHandled = useRef(false);
   const [devInfo, setDevInfo] = useState<{
     beforeContent: string;
     afterContent: string;
@@ -137,6 +139,26 @@ export default function AdminMonthlyPage() {
       cancelled = true;
     };
   }, [yyyyMm]);
+
+  useEffect(() => {
+    if (deepLinkHandled.current) return;
+    const params = new URLSearchParams(location.search);
+    const staffKey = params.get("staffId") || params.get("employeeId");
+    if (!staffKey) return;
+    if (rows.length === 0) return;
+    const target = rows.find((r) => r.id === staffKey || r.userId === staffKey);
+    if (!target || !target.userId) {
+      deepLinkHandled.current = true;
+      return;
+    }
+    const dateParam = params.get("date");
+    const monthParam = params.get("month") || (dateParam ? dateParam.slice(0, 7) : null);
+    setCalendarStaff({ staffId: target.id, name: target.name, userId: target.userId });
+    setCalendarMonth(monthParam ?? yyyyMm);
+    setSelectedDate(dateParam ?? null);
+    setCalendarOpen(true);
+    deepLinkHandled.current = true;
+  }, [location.search, rows, yyyyMm]);
 
   useEffect(() => {
     if (import.meta.env.DEV) {

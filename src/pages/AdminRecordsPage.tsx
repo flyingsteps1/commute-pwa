@@ -4,45 +4,97 @@ import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
 import { useI18n } from "../i18n/I18nProvider";
 import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
-import { getWorkStatus } from "../domain/workStatus";
+import { calcDailyWorkMin, minToHhmm } from "../domain/timeCalc";
+import type { WorkRecord } from "../domain/types";
 import PageHeader from "../components/PageHeader";
 import "./AdminRecordsPage.css";
 
-type TodayStatusCode = "working" | "off" | "no_record" | "incomplete" | "holiday";
+type RecordStatus = "working" | "done" | "incomplete" | "off" | "none";
 
-type TodayStatus = {
-  code: TodayStatusCode;
-  detailTime?: string;
-  detailKind?: "check_in" | "check_out";
+type RecordItem = {
+  record: WorkRecord;
+  staff: StaffPublic | null;
+  status: RecordStatus;
 };
 
-function deriveStatus(r: any | undefined, todayISO: string): TodayStatus {
-  const code = getWorkStatus(r, todayISO);
-  if (code === "off") return { code, detailTime: toHHMM(r?.checkOut), detailKind: "check_out" };
-  if (code === "working" || code === "incomplete") return { code, detailTime: toHHMM(r?.checkIn), detailKind: "check_in" };
-  return { code };
+type RangeMode = "week" | "month" | "custom";
+
+const MS_DAY = 24 * 60 * 60 * 1000;
+
+function toISODate(d: Date) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
-function toHHMM(ts?: string | null) {
-  if (!ts) return undefined;
-  try {
-    const d = new Date(ts);
-    if (!Number.isNaN(d.getTime())) return d.toISOString().substring(11, 16);
-  } catch {
-    /* ignore */
+function startOfWeekMonday(d: Date) {
+  const day = d.getDay();
+  const diff = (day + 6) % 7;
+  const start = new Date(d);
+  start.setDate(d.getDate() - diff);
+  return start;
+}
+
+function isOffNote(note: unknown) {
+  if (!note) return false;
+  const s = String(note).toLowerCase();
+  return s.includes("off") || s.includes("휴무");
+}
+
+function getRecordStatus(record: WorkRecord, todayISO: string): RecordStatus {
+  if (isOffNote(record.note)) return "off";
+  const hasCheckIn = !!record.checkIn;
+  const hasCheckOut = !!record.checkOut;
+  if (hasCheckIn && hasCheckOut) return "done";
+  if (hasCheckIn && !hasCheckOut) {
+    if (record.date === todayISO) return "working";
+    if (record.date < todayISO) return "incomplete";
+    return "none";
   }
-  return ts?.slice(11, 16);
+  if (!hasCheckIn && hasCheckOut) return "incomplete";
+  return "none";
+}
+
+function formatDateLabel(dateISO: string) {
+  return dateISO.replace(/-/g, ".");
 }
 
 export default function AdminRecordsPage() {
   const nav = useNavigate();
   const { t } = useI18n();
-  const [staff, setStaff] = useState<StaffPublic[]>([]);
-  const [records, setRecords] = useState<any[]>([]);
+  const todayISO = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const [records, setRecords] = useState<RecordItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "work" | "incomplete" | "holiday">("all");
-  const todayKey = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const [statusFilter, setStatusFilter] = useState<RecordStatus | "all">("all");
+  const [rangeMode, setRangeMode] = useState<RangeMode>("month");
+  const [customOpen, setCustomOpen] = useState(false);
+
+  const monthStart = useMemo(() => {
+    const d = new Date();
+    return toISODate(new Date(d.getFullYear(), d.getMonth(), 1));
+  }, []);
+  const monthEnd = useMemo(() => {
+    const d = new Date();
+    return toISODate(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+  }, []);
+
+  const [customStart, setCustomStart] = useState(monthStart);
+  const [customEnd, setCustomEnd] = useState(monthEnd);
+
+  const range = useMemo(() => {
+    const today = new Date();
+    if (rangeMode === "week") {
+      const start = startOfWeekMonday(today);
+      const end = new Date(start.getTime() + MS_DAY * 6);
+      return { start: toISODate(start), end: toISODate(end) };
+    }
+    if (rangeMode === "custom") {
+      return { start: customStart, end: customEnd };
+    }
+    return { start: monthStart, end: monthEnd };
+  }, [rangeMode, customStart, customEnd, monthStart, monthEnd]);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,24 +104,27 @@ export default function AdminRecordsPage() {
       try {
         const staffList = await listStaffPublic();
         if (cancelled) return;
-        setStaff(staffList);
         const userIds = staffList.map((s) => s.userId).filter(Boolean) as string[];
         if (userIds.length === 0) {
           setRecords([]);
-        } else {
-          const { data, error: recErr, status } = await supabase
-            .from("work_records")
-            .select("date, staff_user_id, check_in, check_out, break_minutes, note")
-            .eq("date", todayKey)
-            .in("staff_user_id", userIds);
-          if (recErr) {
-            if (import.meta.env.DEV) console.error("[AdminRecords] records error", { status, recErr });
-            throw recErr;
-          }
-          setRecords((data ?? []).map(normalizeWorkRecord));
+          return;
         }
+        const { data, error: recErr } = await supabase
+          .from("work_records")
+          .select("date, staff_user_id, check_in, check_out, break_minutes, note")
+          .in("staff_user_id", userIds)
+          .gte("date", range.start)
+          .lte("date", range.end)
+          .order("date", { ascending: false });
+        if (recErr) throw recErr;
+        const normalized = (data ?? []).map(normalizeWorkRecord);
+        const byUserId = new Map(staffList.map((s) => [s.userId, s]));
+        const items = normalized.map((rec) => {
+          const staffItem = byUserId.get((rec as any).staff_user_id ?? rec.employeeId ?? "");
+          return { record: rec, staff: staffItem ?? null, status: getRecordStatus(rec, todayISO) };
+        });
+        if (!cancelled) setRecords(items);
       } catch (e: any) {
-        console.error(e);
         if (!cancelled) setError(e?.message ?? "failed");
       } finally {
         if (!cancelled) setLoading(false);
@@ -79,140 +134,218 @@ export default function AdminRecordsPage() {
     return () => {
       cancelled = true;
     };
-  }, [todayKey]);
-
-  const rows = staff.map((s) => {
-    const rec = records.find((r) => r.staff_user_id && s.userId && r.staff_user_id === s.userId);
-    const status = deriveStatus(rec, todayKey);
-    return { ...s, status };
-  });
-
-  const filteredRows = rows.filter((r) => {
-    if (filter === "all") return true;
-    if (filter === "work") return r.status.code === "off" || r.status.code === "working";
-    if (filter === "incomplete") return r.status.code === "incomplete";
-    if (filter === "holiday") return r.status.code === "holiday";
-    return true;
-  });
+  }, [range.start, range.end, todayISO]);
 
   const summary = useMemo(() => {
-    let workCount = 0;
-    let incompleteCount = 0;
-    let holidayCount = 0;
-    for (const r of rows) {
-      if (r.status.code === "off" || r.status.code === "working") workCount++;
-      else if (r.status.code === "incomplete") incompleteCount++;
-      else if (r.status.code === "holiday") holidayCount++;
+    let working = 0;
+    let done = 0;
+    let incomplete = 0;
+    let off = 0;
+    for (const r of records) {
+      if (r.status === "working") working++;
+      else if (r.status === "done") done++;
+      else if (r.status === "incomplete") incomplete++;
+      else if (r.status === "off") off++;
     }
-    return { workCount, incompleteCount, holidayCount };
-  }, [rows]);
+    return { working, done, incomplete, off };
+  }, [records]);
+
+  const visibleRecords = records.filter((r) => {
+    if (statusFilter === "all") return true;
+    return r.status === statusFilter;
+  });
 
   return (
-    <div className="recordsRoot">
-      <div className="recordsShell">
+    <div className="adminRecordsRoot">
+      <div className="adminRecordsShell">
         <PageHeader
-          title={t("records")}
-          subtitle={t("admin_dashboard_staff_list")}
+          title="기록"
+          subtitle="직원 기록 조회"
           backAriaLabel={t("back") ?? "back"}
+          rightSlot={(
+            <button
+              type="button"
+              className="pageHeaderBtn pageHeaderBtnAccent"
+              onClick={() => setCustomOpen(true)}
+              aria-label={t("calendar") ?? "calendar"}
+            >
+              <span className="material-symbols-outlined">calendar_month</span>
+            </button>
+          )}
         />
 
-        <main className="recordsMain">
-          <section aria-label="Summary Statistics">
-            <div className="kpiGrid">
-              <SummaryCard label={t("records_filter_work")} value={summary.workCount} />
-              <SummaryCard label={t("records_filter_incomplete")} value={summary.incompleteCount} />
-              <SummaryCard label={t("records_filter_holiday")} value={summary.holidayCount} />
+        <main className="adminRecordsMain">
+          <section className="periodCard" aria-label="기간 요약">
+            <div className="periodRange">{range.start} ~ {range.end}</div>
+            <div className="periodSummary">
+              <span className="periodChip">근무 {summary.working}</span>
+              <span className="periodChip periodChipDone">{t("common_off")} {summary.done}</span>
+              <span className="periodChip periodChipIncomplete">{t("common_incomplete")} {summary.incomplete}</span>
+              <span className="periodChip periodChipOff">{t("common_holiday")} {summary.off}</span>
+            </div>
+            <div className="periodTabs">
+              <button
+                type="button"
+                className={`periodTab ${rangeMode === "week" ? "isActive" : ""}`}
+                onClick={() => setRangeMode("week")}
+              >
+                이번주
+              </button>
+              <button
+                type="button"
+                className={`periodTab ${rangeMode === "month" ? "isActive" : ""}`}
+                onClick={() => setRangeMode("month")}
+              >
+                이번달
+              </button>
+              <button
+                type="button"
+                className={`periodTab ${rangeMode === "custom" ? "isActive" : ""}`}
+                onClick={() => {
+                  setRangeMode("custom");
+                  setCustomOpen(true);
+                }}
+              >
+                직접선택
+              </button>
             </div>
           </section>
 
-          <section className="chipRow" aria-label="Filters">
-            <FilterBtn label={t("records_filter_all")} active={filter === "all"} onClick={() => setFilter("all")} />
-            <FilterBtn label={t("records_filter_work")} active={filter === "work"} onClick={() => setFilter("work")} />
-            <FilterBtn label={t("records_filter_incomplete")} active={filter === "incomplete"} onClick={() => setFilter("incomplete")} />
-            <FilterBtn label={t("records_filter_holiday")} active={filter === "holiday"} onClick={() => setFilter("holiday")} />
+          <section className="statusFilters" aria-label="상태 필터">
+            <button type="button" className={`statusChip ${statusFilter === "all" ? "isActive" : ""}`} onClick={() => setStatusFilter("all")}>
+              {t("records_filter_all")}
+            </button>
+            <button type="button" className={`statusChip ${statusFilter === "working" ? "isActive" : ""}`} onClick={() => setStatusFilter("working")}>
+              {t("common_working")}
+            </button>
+            <button type="button" className={`statusChip ${statusFilter === "done" ? "isActive" : ""}`} onClick={() => setStatusFilter("done")}>
+              {t("common_off")}
+            </button>
+            <button type="button" className={`statusChip ${statusFilter === "incomplete" ? "isActive" : ""}`} onClick={() => setStatusFilter("incomplete")}>
+              {t("common_incomplete")}
+            </button>
+            <button type="button" className={`statusChip ${statusFilter === "off" ? "isActive" : ""}`} onClick={() => setStatusFilter("off")}>
+              {t("common_holiday")}
+            </button>
           </section>
 
-          <section className="staffSection" aria-label="Staff List">
-            <div className="staffHeader">
-              <h2 className="staffTitle">{t("admin_dashboard_staff_list")}</h2>
-            </div>
-            <div className="staffCard">
-              {filteredRows.length === 0 && (
-                <div className="emptyState">
-                  {loading ? t("login_staff_select_placeholder") : t("common_no_record")}
-                </div>
-              )}
-              {error && <div className="errorState">{error}</div>}
-              {filteredRows.map((r) => {
-                const label = r.name ?? r.displayName ?? r.staffId ?? t("common_staff");
-                const badge = (() => {
-                  if (r.status.code === "holiday") {
-                    return { text: t("common_holiday"), className: "staffBadge--off" };
-                  }
-                  if (r.status.code === "working") {
-                    return { text: t("common_working"), className: "staffBadge--working" };
-                  }
-                  if (r.status.code === "incomplete") {
-                    return { text: t("common_incomplete"), className: "staffBadge--incomplete" };
-                  }
-                  if (r.status.code === "off") {
-                    return { text: t("records_filter_work"), className: "staffBadge--work" };
-                  }
-                  return { text: t("common_no_record"), className: "staffBadge--none" };
-                })();
-                const onNavigate = () => nav(`/admin/staff/${r.staffId}?userId=${r.userId ?? ""}`);
-                return (
-                  <div
-                    key={r.staffId}
-                    role="button"
-                    tabIndex={0}
-                    onClick={onNavigate}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        onNavigate();
-                      }
-                    }}
-                    className="staffItem"
-                  >
-                    <div className="staffAvatar">
-                      <span>{label.charAt(0)}</span>
-                    </div>
-                    <div className="staffMeta">
-                      <span className="staffName">{label}</span>
-                      <span className="staffSub">{r.staffId}</span>
-                    </div>
-                    <div className="staffBadge">
-                      <span className={`staffBadgePill ${badge.className}`}>{badge.text}</span>
-                    </div>
+          <section className="recordList" aria-label="직원 기록 리스트">
+            {loading && (
+              <div className="recordsEmpty">로딩중...</div>
+            )}
+            {!loading && error && (
+              <div className="recordsError">{error}</div>
+            )}
+            {!loading && !error && visibleRecords.length === 0 && (
+              <div className="recordsEmpty">{t("common_no_record")}</div>
+            )}
+            {visibleRecords.map((item, idx) => {
+              const staffName = item.staff?.name ?? item.staff?.displayName ?? item.staff?.staffId ?? t("common_staff");
+              const staffId = item.staff?.staffId ?? item.staff?.userId ?? item.record.employeeId ?? `staff-${idx}`;
+              const dateISO = item.record.date;
+              const status = item.status;
+              const detail = calcDailyWorkMin(item.record);
+              const timeLine = (() => {
+                if (status === "done") return `${item.record.checkIn ?? "--:--"} - ${item.record.checkOut ?? "--:--"}`;
+                if (status === "working") return `${item.record.checkIn ?? "--:--"} - ...`;
+                if (status === "incomplete") return `${item.record.checkIn ?? "--:--"} - --:--`;
+                return "-";
+              })();
+              const descLine = (() => {
+                if (status === "done") {
+                  return `휴게 ${minToHhmm(detail.breakMin)} | 총근무 ${detail.workMin === null ? "--:--" : minToHhmm(detail.workMin)}`;
+                }
+                if (status === "working") {
+                  return "근무중";
+                }
+                if (status === "incomplete") {
+                  return "퇴근 미처리";
+                }
+                if (status === "off") {
+                  return item.record.note ? String(item.record.note) : t("common_holiday");
+                }
+                return t("common_no_record");
+              })();
+              const badge = (() => {
+                if (status === "working") return { text: t("common_working"), className: "recordBadge--working" };
+                if (status === "done") return { text: t("common_off"), className: "recordBadge--done" };
+                if (status === "incomplete") return { text: t("common_incomplete"), className: "recordBadge--incomplete" };
+                if (status === "off") return { text: t("common_holiday"), className: "recordBadge--off" };
+                return { text: t("common_no_record"), className: "recordBadge--none" };
+              })();
+              const onNavigate = () => {
+                const month = dateISO.slice(0, 7);
+                nav(`/admin/monthly?staffId=${encodeURIComponent(staffId)}&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}`);
+              };
+              return (
+                <button
+                  key={`${staffId}-${dateISO}`}
+                  type="button"
+                  className={`recordCard ${status === "incomplete" ? "recordCard--alert" : ""}`}
+                  onClick={onNavigate}
+                >
+                  <div className="recordHeader">
+                    <span className="recordDate">{formatDateLabel(dateISO)}</span>
+                    <span className="recordBadge">
+                      <span className={`recordBadgePill ${badge.className}`}>{badge.text}</span>
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="recordMeta">
+                    <div className="recordStaff">
+                      <span className="recordName">{staffName}</span>
+                      <span className="recordStaffId">{staffId}</span>
+                    </div>
+                    <span className="recordChevron material-symbols-outlined">chevron_right</span>
+                  </div>
+                  <div className="recordBody">
+                    <div className="recordTime">
+                      {timeLine}
+                      {status === "working" && <span className="recordPing" aria-hidden="true" />}
+                    </div>
+                    <div className="recordDesc">{descLine}</div>
+                  </div>
+                </button>
+              );
+            })}
           </section>
         </main>
       </div>
-    </div>
-  );
-}
 
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="kpiCard">
-      <span className="kpiValue">{value}</span>
-      <span className="kpiLabel">{label}</span>
+      {customOpen && (
+        <div className="recordsModalOverlay" role="presentation">
+          <div className="recordsModal" role="dialog" aria-modal="true" aria-label="기간 직접 선택">
+            <div className="recordsModalHeader">
+              <span className="recordsModalTitle">기간 직접선택</span>
+              <button type="button" className="recordsModalClose" onClick={() => setCustomOpen(false)}>
+                닫기
+              </button>
+            </div>
+            <div className="recordsModalBody">
+              <label className="recordsModalField">
+                <span>시작일</span>
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                />
+              </label>
+              <label className="recordsModalField">
+                <span>종료일</span>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                />
+              </label>
+            </div>
+            <div className="recordsModalActions">
+              <button type="button" className="recordsModalBtn" onClick={() => setCustomOpen(false)}>
+                적용
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
-}
-
-function FilterBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`chip ${active ? "chipActive" : ""}`}
-    >
-      {label}
-    </button>
   );
 }
