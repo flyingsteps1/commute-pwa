@@ -180,14 +180,40 @@ Deno.serve(async (req: Request) => {
     const loginEmail = `${staffId}@oracletour.local`;
 
     async function findStaffRow(staffIdValue: string) {
-      const { data, error } = await adminClient
+      const workplaceId = (payloadWorkplaceId || adminProfile?.workplace_id) ?? null;
+      const fields = "staff_id, user_id, display_name, workplace_id";
+      const byStaffId = await adminClient
         .from("staff_public")
-        .select("staff_id, user_id, display_name, workplace_id")
-        .eq("workplace_id", (payloadWorkplaceId || adminProfile?.workplace_id) ?? null)
+        .select(fields)
+        .eq("workplace_id", workplaceId)
         .eq("staff_id", staffIdValue)
         .maybeSingle();
-      if (error) return { row: null, error };
-      return { row: data ?? null, error: null };
+      if (byStaffId.error && !isMissingColumn(byStaffId.error as any)) {
+        return { row: null, error: byStaffId.error };
+      }
+      if (byStaffId.data) return { row: byStaffId.data ?? null, error: null };
+
+      const byUserId = await adminClient
+        .from("staff_public")
+        .select(fields)
+        .eq("workplace_id", workplaceId)
+        .eq("user_id", staffIdValue)
+        .maybeSingle();
+      if (byUserId.error && !isMissingColumn(byUserId.error as any)) {
+        return { row: null, error: byUserId.error };
+      }
+      if (byUserId.data) return { row: byUserId.data ?? null, error: null };
+
+      const byDisplay = await adminClient
+        .from("staff_public")
+        .select(fields)
+        .eq("workplace_id", workplaceId)
+        .eq("display_name", staffIdValue)
+        .maybeSingle();
+      if (byDisplay.error && !isMissingColumn(byDisplay.error as any)) {
+        return { row: null, error: byDisplay.error };
+      }
+      return { row: byDisplay.data ?? null, error: null };
     }
 
     if (effectiveAction === "debug") {
@@ -274,7 +300,7 @@ Deno.serve(async (req: Request) => {
         });
       }
       if (!row) {
-        return json(404, { ok: false, step: "LOOKUP_STAFF_PUBLIC", detail: "STAFF_NOT_FOUND", action: effectiveAction, staffId, workplaceId: payloadWorkplaceId });
+        return json(404, { ok: false, step: "RESOLVE_STAFF", detail: "STAFF_NOT_FOUND", action: effectiveAction, staffId, workplaceId: payloadWorkplaceId });
       }
       const userId = row.user_id ?? null;
 
@@ -380,29 +406,6 @@ Deno.serve(async (req: Request) => {
           staffId,
           workplaceId: payloadWorkplaceId,
         });
-      }
-
-      if (userId) {
-        const { error: nullifyErr } = await adminClient
-          .from("work_records")
-          .update({ staff_user_id: null })
-          .eq("staff_user_id", userId);
-        if (nullifyErr) {
-          const code = (nullifyErr as any)?.code ?? null;
-          return json(500, {
-            ok: false,
-            step: "NULLIFY_WORK_RECORDS",
-            detail: nullifyErr.message,
-            code,
-            hint: (nullifyErr as any)?.hint ?? null,
-            guidance: code === "23502"
-              ? "staff_user_id is NOT NULL. Apply migration to drop NOT NULL."
-              : null,
-            action: effectiveAction,
-            staffId,
-            workplaceId: payloadWorkplaceId,
-          });
-        }
       }
 
       if (deletedAtSchema.ok && deletedAtSchema.has && userId) {
