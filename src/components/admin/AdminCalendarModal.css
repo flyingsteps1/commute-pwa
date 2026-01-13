@@ -176,6 +176,28 @@
   z-index: auto;
 }
 
+/* --- Fix: detail card became too narrow in admin monthly staff calendar modal --- */
+.adminCalModal .detailPanel,
+.adminCalModal .adminCalStaffSection {
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.adminCalModal .detailCard {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+.adminCalModal .detailRow {
+  width: 100%;
+}
+
+.adminCalModal .detailValue {
+  text-align: right;
+}
+
 @media (max-width: 720px) {
   .calendarLayout {
     grid-template-columns: 1fr;
