@@ -119,7 +119,7 @@ export default function AdminCalendarModal(props: Props) {
   if (!staffProps) {
     return (
       <div className="no-print adminCalendarOverlay isStaff" onClick={onClose}>
-        <div className="adminCalendarCard" onClick={(e) => e.stopPropagation()}>
+        <div className="adminCalendarCard adminCalModal" onClick={(e) => e.stopPropagation()}>
           <div className="calendarHeader">
             <div className="monthNav">
               <button
@@ -212,7 +212,7 @@ export default function AdminCalendarModal(props: Props) {
 
   return (
     <div className="no-print adminCalendarOverlay" onClick={onClose}>
-      <div className="adminCalendarCard isStaff" onClick={(e) => e.stopPropagation()}>
+      <div className="adminCalendarCard isStaff adminCalModal" onClick={(e) => e.stopPropagation()}>
         <div className="calendarHeader">
           <div className="headerTitles">
             <h2 className="staffTitle">{staffName || t("common_staff")}</h2>
@@ -240,139 +240,158 @@ export default function AdminCalendarModal(props: Props) {
 
         <div className="calendarBody">
           <div className="calendarLayout">
-          <div className="calendarPanel">
-            <div className="dowRow">
-              {DOW_LABELS.map((label, idx) => (
-                <div
-                  key={`dow-${idx}`}
-                  className={`dowCell ${idx === 0 ? "dowSun" : ""} ${idx === 6 ? "dowSat" : ""}`}
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-            <div className="calendarGrid">
-              {cells.map((cell, idx) => {
-                if (!cell) return <div key={`empty-${idx}`} className="calendarCell emptyCell" />;
-                const isToday = cell.dateISO === todayISO;
-                const isSelected = cell.dateISO === staffSelected;
-                const record = cell.record;
-                const status = record ? getWorkStatus(record, todayISO) : "no_record";
-                const statusLabel =
-                  status === "holiday"
-                    ? t("common_holiday")
-                    : status === "off"
-                      ? t("common_off")
-                      : status === "working"
-                        ? t("common_working")
-                        : status === "incomplete"
-                          ? t("common_incomplete")
-                          : "";
-                const statusClass =
-                  status === "holiday"
-                    ? "statusOff"
-                    : status === "off"
-                      ? "statusComplete"
-                      : status === "working"
-                        ? "statusWorking"
-                        : status === "incomplete"
-                          ? "statusIncomplete"
-                          : "statusNone";
-                return (
-                  <button
-                    key={`d-${cell.dateISO}`}
-                    type="button"
-                    className={`calendarCell ${isToday ? "isToday" : ""} ${isSelected ? "isSelected" : ""}`}
-                    onClick={() => staffProps.onSelectDate(cell.dateISO)}
+            <div className="calendarPanel adminCalCalendar">
+              <div className="dowRow">
+                {DOW_LABELS.map((label, idx) => (
+                  <div
+                    key={`dow-${idx}`}
+                    className={`dowCell ${idx === 0 ? "dowSun" : ""} ${idx === 6 ? "dowSat" : ""}`}
                   >
-                    <span className="cellDay">{cell.dd}</span>
-                    {record && status !== "no_record" && <span className={`statusBadge ${statusClass}`}>{statusLabel}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="detailPanel">
-            <div className="detailCard">
-              <div className="detailHeader">
-                <div className="detailDate">{staffSelected ?? "날짜를 선택하세요"}</div>
+                    {label}
+                  </div>
+                ))}
               </div>
+              <div className="calendarGrid">
+                {cells.map((cell, idx) => {
+                  if (!cell) return <div key={`empty-${idx}`} className="calendarCell emptyCell" />;
+                  const isToday = cell.dateISO === todayISO;
+                  const isSelected = cell.dateISO === staffSelected;
+                  const record = cell.record;
+                  const status = record ? getWorkStatus(record, todayISO) : "no_record";
+                  const statusLabel =
+                    status === "holiday"
+                      ? t("common_holiday")
+                      : status === "off"
+                        ? t("common_off")
+                        : status === "working"
+                          ? t("common_working")
+                          : status === "incomplete"
+                            ? t("common_incomplete")
+                            : "";
+                  const statusClass =
+                    status === "holiday"
+                      ? "statusOff"
+                      : status === "off"
+                        ? "statusComplete"
+                        : status === "working"
+                          ? "statusWorking"
+                          : status === "incomplete"
+                            ? "statusIncomplete"
+                            : "statusNone";
+                  return (
+                    <button
+                      key={`d-${cell.dateISO}`}
+                      type="button"
+                      className={`calendarCell ${isToday ? "isToday" : ""} ${isSelected ? "isSelected" : ""}`}
+                      onClick={() => staffProps.onSelectDate(cell.dateISO)}
+                    >
+                      <span className="cellDay">{cell.dd}</span>
+                      {record && status !== "no_record" && (
+                        <span
+                          className={`statusBadge adminCalBadge ${
+                            status === "holiday"
+                              ? "adminCalBadge--off"
+                              : status === "off"
+                                ? "adminCalBadge--done"
+                                : status === "working"
+                                  ? "adminCalBadge--working"
+                                  : status === "incomplete"
+                                    ? "adminCalBadge--pending"
+                                    : "adminCalBadge--work"
+                          } ${statusClass}`}
+                        >
+                          {statusLabel}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-              {!staffSelected && (
-                <div className="detailEmpty">날짜를 선택하세요</div>
-              )}
+            <div className="adminCalDivider" aria-hidden="true" />
+            <div className="detailPanel adminCalStaffSection">
+              <div className="detailCard">
+                <div className="detailHeader adminCalStaffHeader">
+                  <div className="detailDate">{staffSelected ?? "날짜를 선택하세요"}</div>
+                </div>
 
-              {staffSelected && !detailRecord && (
-                <div className="detailEmpty">{t("common_no_record")}</div>
-              )}
+                {!staffSelected && (
+                  <div className="detailEmpty">날짜를 선택하세요</div>
+                )}
 
-              {staffSelected && detailRecord && detailIsOff && (
-                <div className="detailEmpty">{t("common_holiday")} (OFF)</div>
-              )}
+                {staffSelected && !detailRecord && (
+                  <div className="detailEmpty">{t("common_no_record")}</div>
+                )}
 
-              {staffSelected && detailRecord && detailWorking && (
-                <>
-                  <div className="detailNote">{t("common_working")}</div>
-                  {detailRecord.checkIn && (
+                {staffSelected && detailRecord && detailIsOff && (
+                  <div className="detailEmpty">{t("common_holiday")} (OFF)</div>
+                )}
+
+                {staffSelected && detailRecord && detailWorking && (
+                  <>
+                    <div className="detailNote">{t("common_working")}</div>
+                    {detailRecord.checkIn && (
+                      <div className="detailRow">
+                        <span className="detailLabel">{t("common_check_in")}</span>
+                        <span className="detailValue">{detailRecord.checkIn}</span>
+                      </div>
+                    )}
+                    {detailRecord.breakMin !== undefined && (
+                      <div className="detailRow">
+                        <span className="detailLabel">{t("today_label_break")}</span>
+                        <span className="detailValue">{minToHhmm(detailRecord.breakMin ?? 0)}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {staffSelected && detailRecord && detailIncomplete && (
+                  <>
+                    <div className="detailNote">미완료(체크아웃 누락)</div>
+                    {detailRecord.checkIn && (
+                      <div className="detailRow">
+                        <span className="detailLabel">{t("common_check_in")}</span>
+                        <span className="detailValue">{detailRecord.checkIn}</span>
+                      </div>
+                    )}
+                    {detailRecord.checkOut && (
+                      <div className="detailRow">
+                        <span className="detailLabel">{t("common_check_out")}</span>
+                        <span className="detailValue">{detailRecord.checkOut}</span>
+                      </div>
+                    )}
+                    {detailRecord.breakMin !== undefined && (
+                      <div className="detailRow">
+                        <span className="detailLabel">{t("today_label_break")}</span>
+                        <span className="detailValue">{minToHhmm(detailRecord.breakMin ?? 0)}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {staffSelected && detailRecord && detailComplete && (
+                  <>
                     <div className="detailRow">
-                      <span className="detailLabel">{t("common_check_in")}</span>
-                      <span className="detailValue">{detailRecord.checkIn}</span>
+                      <span className="detailLabel">{t("today_label_check_in")}</span>
+                      <span className="detailValue">{detailRecord.checkIn ?? "--"}</span>
                     </div>
-                  )}
-                  {detailRecord.breakMin !== undefined && (
+                    <div className="detailRow">
+                      <span className="detailLabel">{t("today_label_check_out")}</span>
+                      <span className="detailValue">{detailRecord.checkOut ?? "--"}</span>
+                    </div>
                     <div className="detailRow">
                       <span className="detailLabel">{t("today_label_break")}</span>
-                      <span className="detailValue">{minToHhmm(detailRecord.breakMin ?? 0)}</span>
+                      <span className="detailValue">{minToHhmm(detailDaily.breakMin ?? 0)}</span>
                     </div>
-                  )}
-                </>
-              )}
-
-              {staffSelected && detailRecord && detailIncomplete && (
-                <>
-                  <div className="detailNote">미완료(체크아웃 누락)</div>
-                  {detailRecord.checkIn && (
                     <div className="detailRow">
-                      <span className="detailLabel">{t("common_check_in")}</span>
-                      <span className="detailValue">{detailRecord.checkIn}</span>
+                      <span className="detailLabel">{t("today_sum_work")}</span>
+                      <span className="detailValue">
+                        {detailDaily.workMin === null ? "--" : minToHhmm(detailDaily.workMin)}
+                      </span>
                     </div>
-                  )}
-                  {detailRecord.checkOut && (
-                    <div className="detailRow">
-                      <span className="detailLabel">{t("common_check_out")}</span>
-                      <span className="detailValue">{detailRecord.checkOut}</span>
-                    </div>
-                  )}
-                  {detailRecord.breakMin !== undefined && (
-                    <div className="detailRow">
-                      <span className="detailLabel">{t("today_label_break")}</span>
-                      <span className="detailValue">{minToHhmm(detailRecord.breakMin ?? 0)}</span>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {staffSelected && detailRecord && detailComplete && (
-                <>
-                  <div className="detailRow">
-                    <span className="detailLabel">{t("today_label_check_in")}</span>
-                    <span className="detailValue">{detailRecord.checkIn ?? "--"}</span>
-                  </div>
-                  <div className="detailRow">
-                    <span className="detailLabel">{t("today_label_check_out")}</span>
-                    <span className="detailValue">{detailRecord.checkOut ?? "--"}</span>
-                  </div>
-                  <div className="detailRow">
-                    <span className="detailLabel">{t("today_label_break")}</span>
-                    <span className="detailValue">{minToHhmm(detailDaily.breakMin ?? 0)}</span>
-                  </div>
-                  <div className="detailRow">
-                    <span className="detailLabel">{t("today_sum_work")}</span>
-                    <span className="detailValue">{detailDaily.workMin === null ? "--" : minToHhmm(detailDaily.workMin)}</span>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
             </div>
           </div>
         </div>

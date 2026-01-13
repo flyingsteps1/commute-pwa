@@ -1,7 +1,7 @@
 .adminCalendarOverlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,11 +25,25 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  z-index: 10000;
 }
 
 .adminCalendarCard.isStaff {
   width: min(92vw, 760px);
   max-width: 760px;
+}
+
+.adminCalModal {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.adminCalModal .calendarBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .calendarHeader {
@@ -132,6 +146,36 @@
   align-items: start;
 }
 
+.adminCalModal .calendarLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adminCalCalendar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adminCalDivider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 2px 0 6px;
+}
+
+.adminCalStaffSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adminCalStaffHeader {
+  position: static;
+  background: #ffffff;
+  z-index: auto;
+}
+
 @media (max-width: 720px) {
   .calendarLayout {
     grid-template-columns: 1fr;
@@ -181,6 +225,17 @@
   text-orientation: mixed;
   cursor: pointer;
   transition: background 0.2s ease, border 0.2s ease, transform 0.1s ease;
+}
+
+.adminCalCalendar .calendarCell {
+  text-align: center;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.adminCalCalendar .cellDay {
+  align-self: center;
 }
 
 .calendarCell:hover {
@@ -282,11 +337,12 @@
   font-weight: 600;
   color: #94a3b8;
   background: #f1f5f9;
-  padding: 2px 6px;
+  padding: 0 8px;
   border-radius: 999px;
   align-self: flex-start;
   line-height: 1;
-  min-height: 20px;
+  height: 22px;
+  min-height: 22px;
   box-sizing: border-box;
   text-align: center;
   letter-spacing: -0.2px;
@@ -296,14 +352,45 @@
   text-orientation: mixed;
 }
 
-.adminCalendarCard.isStaff .statusBadge {
+.adminCalBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 22px;
   min-height: 22px;
   padding: 0 8px;
+  border-radius: 999px;
   line-height: 1;
+  font-size: 11px;
+  font-weight: 600;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
+  letter-spacing: -0.2px;
+}
+
+.adminCalBadge--work {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+}
+
+.adminCalBadge--done {
+  color: #0a85ff;
+  background: rgba(10, 133, 255, 0.12);
+}
+
+.adminCalBadge--off {
+  color: #e35d5b;
+  background: rgba(227, 93, 91, 0.12);
+}
+
+.adminCalBadge--pending {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.adminCalBadge--working {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .statusBadge.statusOff {
