@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
+import { getAppSession } from "../storage/appSession";
 import { useI18n } from "../i18n/I18nProvider";
 import { supabase } from "../storage/supabaseClient";
 import { normalizeWorkRecord } from "../storage/todayRepo";
@@ -104,19 +105,71 @@ export default function AdminRecordsPage() {
       try {
         const staffList = await listStaffPublic();
         if (cancelled) return;
+        console.log("========== ADMIN RECORDS DEBUG ==========");
+        console.log("range =", range);
+        console.log("staffList.length =", staffList.length);
+        console.log(
+          "staffList preview =",
+          staffList.slice(0, 5).map((s) => ({
+            name: s.name,
+            displayName: s.displayName,
+            userId: s.userId,
+            staffId: s.staffId,
+          }))
+        );
+        console.log(
+          "staffList userIds preview =",
+          staffList.map((s) => s.userId).filter(Boolean).slice(0, 10)
+        );
         const userIds = staffList.map((s) => s.userId).filter(Boolean) as string[];
         if (userIds.length === 0) {
           setRecords([]);
           return;
         }
-        const { data, error: recErr } = await supabase
-          .from("work_records")
-          .select("date, staff_user_id, check_in, check_out, break_minutes, note")
-          .in("staff_user_id", userIds)
-          .gte("date", range.start)
-          .lte("date", range.end)
-          .order("date", { ascending: false });
+        const workplaceId = getAppSession()?.workplaceId ?? import.meta.env.VITE_WORKPLACE_ID ?? null;
+        let data: any[] | null = null;
+        let recErr: any = null;
+
+        if (workplaceId) {
+          const res = await supabase
+            .from("work_records")
+            .select("date, staff_user_id, check_in, check_out, break_minutes, note")
+            .eq("workplace_id", workplaceId)
+            .gte("date", range.start)
+            .lte("date", range.end)
+            .order("date", { ascending: false });
+          data = res.data ?? null;
+          recErr = res.error ?? null;
+        }
+
+        if (recErr || !workplaceId) {
+          const res = await supabase
+            .from("work_records")
+            .select("date, staff_user_id, check_in, check_out, break_minutes, note")
+            .in("staff_user_id", userIds)
+            .gte("date", range.start)
+            .lte("date", range.end)
+            .order("date", { ascending: false });
+          data = res.data ?? null;
+          recErr = res.error ?? null;
+        }
+
         if (recErr) throw recErr;
+
+        const rows = data ?? [];
+        console.log("records.rows.length =", rows.length);
+        const rowStaffIds = Array.from(
+          new Set(rows.map((r: any) => r.staff_user_id).filter(Boolean))
+        );
+        console.log("distinct staff_user_id count =", rowStaffIds.length);
+        console.log("staff_user_id preview =", rowStaffIds.slice(0, 10));
+        const staffUserIds = new Set(staffList.map((s) => s.userId).filter(Boolean));
+        const rowIdSet = new Set(rowStaffIds);
+        const idsInRowsNotInStaff = rowStaffIds.filter((id) => !staffUserIds.has(id)).slice(0, 10);
+        const idsInStaffNotInRows = Array.from(staffUserIds).filter((id) => !rowIdSet.has(id)).slice(0, 10);
+        console.log("idsInRowsNotInStaff preview =", idsInRowsNotInStaff);
+        console.log("idsInStaffNotInRows preview =", idsInStaffNotInRows);
+
         const normalized = (data ?? []).map(normalizeWorkRecord);
         const byUserId = new Map(staffList.map((s) => [s.userId, s]));
         const items = normalized.map((rec) => {

@@ -28,6 +28,27 @@ function daysInMonth(yyyyMm: string) {
   return new Date(y, m, 0).getDate();
 }
 
+function isOffNote(note: unknown) {
+  if (!note) return false;
+  const s = String(note).toLowerCase();
+  return s === "off" || s.includes("휴무");
+}
+
+function getTodayStatus(record: WorkRecord | undefined, todayISO: string) {
+  if (!record) return { code: "no_record" as const };
+  if (isOffNote(record.note)) {
+    return { code: "holiday" as const, detailTime: record.note ? String(record.note) : "-" };
+  }
+  const hasCheckIn = !!record.checkIn;
+  const hasCheckOut = !!record.checkOut;
+  if (hasCheckIn && hasCheckOut) return { code: "off" as const, detailTime: record.checkOut };
+  if (hasCheckIn && !hasCheckOut) {
+    if (record.date === todayISO) return { code: "working" as const, detailTime: record.checkIn };
+    return { code: "incomplete" as const, detailTime: record.checkIn };
+  }
+  return { code: "no_record" as const };
+}
+
 export default function AdminStaffDetailPage() {
   const nav = useNavigate();
   const { staffId } = useParams<{ staffId: string }>();
@@ -70,14 +91,7 @@ export default function AdminStaffDetailPage() {
       setRows(sorted);
       const todayISO = new Date().toISOString().slice(0, 10);
       const today = sorted.find((r) => r.date === todayISO);
-      if (today) {
-        if (today.note === "OFF") setTodayStatus({ code: "holiday" });
-        else if (today.checkIn && today.checkOut) setTodayStatus({ code: "off", detailTime: today.checkOut });
-        else if (today.checkIn) setTodayStatus({ code: "working", detailTime: today.checkIn });
-        else setTodayStatus({ code: "incomplete" });
-      } else {
-        setTodayStatus(null);
-      }
+      setTodayStatus(getTodayStatus(today, todayISO));
       if (import.meta.env.DEV) console.log("[AdminStaffDetail] loaded", { yyyyMm, count: sorted.length, sample: sorted[0] });
     }
     load();
