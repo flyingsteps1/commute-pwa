@@ -111,17 +111,17 @@ Deno.serve(async (req: Request) => {
       req.headers.get("authorization") ??
       req.headers.get("Authorization") ??
       "";
-    if (!rawAuth) return json(401, { step: "AUTH_HEADER_MISSING", error: "AUTH_HEADER_MISSING", action: null });
+    if (!rawAuth) return json(401, { step: "AUTH_MISSING", detail: "AUTH_HEADER_MISSING", action: null });
 
     const authHeader = rawAuth.startsWith("Bearer ") ? rawAuth : `Bearer ${rawAuth}`;
-    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const supabaseUser = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
     const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    const { data: userData, error: userErr } = await supabaseUser.auth.getUser();
     if (userErr || !userData.user) {
-      const detail: Record<string, unknown> = { step: "JWT_INVALID", error: "JWT_INVALID", detail: userErr?.message ?? null, action: null };
+      const detail: Record<string, unknown> = { step: "AUTH_INVALID", detail: userErr?.message ?? null, action: null };
       if (Deno.env.get("ENV") === "DEV") {
         detail.authHeaderPrefix = authHeader.slice(0, 10);
         detail.authHeaderLen = authHeader.length;
@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
 
     const adminOnly = effectiveAction !== "ensure_profile" && effectiveAction !== "ping";
     if (adminOnly) {
-      const { data: profile, error: profErr } = await adminClient
+      const { data: profile, error: profErr } = await supabaseUser
         .from("profiles")
         .select("role, workplace_id")
         .eq("id", userData.user.id)
