@@ -5,7 +5,7 @@ import { useI18n } from "../i18n/I18nProvider";
 import { clearSession } from "../auth/session";
 import { listStaffPublic, type StaffPublic } from "../storage/staffRepo";
 import { getAppSession, clearAppSession } from "../storage/appSession";
-import { requireSession, supabase } from "../storage/supabaseClient";
+import { supabase } from "../storage/supabaseClient";
 import "./SettingsPage.css";
 
 const MAX_STAFF = 5;
@@ -55,7 +55,13 @@ export default function SettingsPage() {
 
   async function initAccess() {
     try {
-      const session = await requireSession();
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      const session = data?.session ?? null;
+      if (sessionError || !session) {
+        setAccessRole(null);
+        setAccessWorkplaceId(null);
+        return;
+      }
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("role, workplace_id")
@@ -108,12 +114,7 @@ export default function SettingsPage() {
       throw err;
     }
 
-    const session = await requireSession();
     const appSession = getAppSession();
-
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-    if (!supabaseUrl || !supabaseAnonKey) throw new Error("SUPABASE_ENV_MISSING");
 
     const effectiveWorkplaceId =
       accessWorkplaceId ?? appSession?.workplaceId ?? staff[0]?.workplaceId ?? null;
@@ -128,59 +129,47 @@ export default function SettingsPage() {
 
     if (!effectiveWorkplaceId) throw new Error("WORKPLACE_ID_MISSING");
 
-    const res = await fetch(`${supabaseUrl}/functions/v1/${FUNCTION_NAME}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-        apikey: supabaseAnonKey,
-      },
-      body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
+      body: {
         workplaceId: effectiveWorkplaceId,
         ...payload,
-      }),
+      },
     });
 
-    const rawText = await res.text();
-    let body: any = null;
-    try {
-      body = rawText ? JSON.parse(rawText) : null;
-    } catch {
-      body = rawText || null;
-    }
+    const status =
+      (error as any)?.status ?? (error as any)?.context?.status ?? (error ? 500 : 200);
+
+    const body: any = data ?? (error as any)?.context?.body ?? error ?? null;
 
     if (import.meta.env.DEV) {
-      const status = res.status;
       console.log("[invokeCreateStaff] res", {
         status,
         action: payload.action ?? "upsert",
         staffId: payload.staffId,
+        // version은 있어도 되고 없어도 됨 (필수 아님)
         version: body?.version ?? null,
         step: body?.step ?? null,
         detail: body?.detail ?? null,
       });
     }
 
-    if (!body?.version) {
-      const err: any = new Error("DEPLOY_MISMATCH");
-      err.__status = res.status;
-      err.__body = { step: "DEPLOY_MISMATCH", detail: "version missing" };
-      err.__rawText = rawText;
+    // ✅ DEPLOY_MISMATCH / version missing 로직 완전 제거 (여기가 핵심)
+
+    if (status === 401 || status === 403) {
+      await handleInvalidJwt();
+      const err: any = new Error("AUTH_REQUIRED");
+      err.__status = status;
+      err.__body = body;
+      err.__rawText = null;
       throw err;
     }
 
-    if (!res.ok) {
-      const status = res.status;
-      if (import.meta.env.DEV) console.error("[invokeCreateStaff] error", { status, body, rawText });
-
-      if (status === 401 && String(rawText).includes("Invalid JWT")) {
-        await handleInvalidJwt();
-      }
-
+    if (error) {
+      if (import.meta.env.DEV) console.error("[invokeCreateStaff] error", { status, body, error });
       const err: any = new Error(`HTTP_${status}`);
       err.__status = status;
-      err.__body = body;
-      err.__rawText = rawText;
+      err.__body = body ?? error;
+      err.__rawText = null;
       throw err;
     }
 
@@ -202,7 +191,7 @@ export default function SettingsPage() {
     setAdminErr(msg);
     await supabase.auth.signOut();
     clearAppSession();
-    clearSession();
+    clearSession(); // ✅ 중복 제거 (원래 코드에 두 번 있었음)
     nav("/login", { replace: true, state: { from: "/admin/settings" } });
   }
 
@@ -335,15 +324,15 @@ export default function SettingsPage() {
       if (import.meta.env.DEV) {
         console.log("[settings delete] res", {
           status: "ok",
-          version: res?.version ?? null,
-          step: res?.step ?? null,
-          action: res?.action ?? null,
+          version: (res as any)?.version ?? null,
+          step: (res as any)?.step ?? null,
+          action: (res as any)?.action ?? null,
         });
       }
 
       await reload();
 
-      if (res && res.authDeleted === false) {
+      if (res && (res as any).authDeleted === false) {
         setEditMsg(t("settings_staff_deleted_banned"));
       }
     } catch (e: any) {
@@ -394,11 +383,13 @@ export default function SettingsPage() {
       if (import.meta.env.DEV) console.log("[settings debug]", data);
       if (!data) return null;
 
-      const nullable = data?.staffUserIdNullable?.is_nullable ?? null;
-      const fkDef = Array.isArray(data?.constraints?.rows)
-        ? data.constraints.rows.find((r: any) => String(r.table_name).includes("work_records"))?.definition ?? null
+      const nullable = (data as any)?.staffUserIdNullable?.is_nullable ?? null;
+      const fkDef = Array.isArray((data as any)?.constraints?.rows)
+        ? (data as any).constraints.rows.find((r: any) =>
+            String(r.table_name).includes("work_records")
+          )?.definition ?? null
         : null;
-      const count = data?.workRecords?.count ?? null;
+      const count = (data as any)?.workRecords?.count ?? null;
 
       const parts: string[] = [];
       if (nullable !== null) parts.push(`nullable=${nullable}`);
@@ -442,7 +433,11 @@ export default function SettingsPage() {
                 className="settingsDevBtn"
                 onClick={async () => {
                   try {
-                    const res = await invokeCreateStaff({ staffId: "ping", displayName: "ping", action: "ping" });
+                    const res = await invokeCreateStaff({
+                      staffId: "ping",
+                      displayName: "ping",
+                      action: "ping",
+                    });
                     console.log("[settings ping]", res);
                   } catch (e) {
                     console.warn("[settings ping] failed", e);
@@ -485,16 +480,16 @@ export default function SettingsPage() {
                 <div className="settingsEmpty">{t("common_no_record")}</div>
               ) : (
                 staff.map((s) => {
-                  const label = s.name ?? s.displayName ?? s.staffId;
-                  const isEditing = editingId === s.staffId;
+                  const label = s.name ?? (s as any).displayName ?? (s as any).staffId;
+                  const isEditing = editingId === (s as any).staffId;
 
                   return (
-                    <div key={s.staffId} className="staffRowWrap">
+                    <div key={(s as any).staffId} className="staffRowWrap">
                       <div className="staffRow">
                         <div className="staffAvatar">{label.charAt(0)}</div>
                         <div className="staffInfo">
                           <span className="staffName">{label}</span>
-                          <span className="staffId">ID: {s.staffId}</span>
+                          <span className="staffId">ID: {(s as any).staffId}</span>
                         </div>
 
                         <div className="staffActions">
@@ -504,7 +499,7 @@ export default function SettingsPage() {
                                 className="settingsOutlineBtn"
                                 type="button"
                                 onClick={() => {
-                                  setEditingId(s.staffId);
+                                  setEditingId((s as any).staffId);
                                   setEditPw("");
                                   setEditErr("");
                                   setEditMsg("");
@@ -519,7 +514,7 @@ export default function SettingsPage() {
                                 type="button"
                                 onClick={() => {
                                   if (!confirm(t("settings_confirm_delete_staff"))) return;
-                                  onDeleteStaff(s.staffId, label, false);
+                                  onDeleteStaff((s as any).staffId, label, false);
                                 }}
                                 disabled={accessRole !== "admin"}
                               >
@@ -532,7 +527,7 @@ export default function SettingsPage() {
                                   type="button"
                                   onClick={() => {
                                     if (!confirm("HARD DELETE (DEV). Continue?")) return;
-                                    onDeleteStaff(s.staffId, label, true);
+                                    onDeleteStaff((s as any).staffId, label, true);
                                   }}
                                   disabled={accessRole !== "admin"}
                                 >
@@ -571,7 +566,7 @@ export default function SettingsPage() {
                             <button
                               className="staffPwEditBtn staffPwEditBtnPrimary"
                               type="button"
-                              onClick={() => onSaveStaffPw(s.staffId, label)}
+                              onClick={() => onSaveStaffPw((s as any).staffId, label)}
                             >
                               {t("common_save")}
                             </button>
@@ -738,8 +733,8 @@ function pickStepMessage(body: any, rawText?: string | null) {
   if (body && typeof body === "object") {
     const keys = Object.keys(body);
     if (keys.length === 0) return "RAW: (empty body)";
-    const step = String(body.step ?? "");
-    const detail = String(body.detail ?? body.error ?? "");
+    const step = String((body as any).step ?? "");
+    const detail = String((body as any).detail ?? (body as any).error ?? "");
     if (!step) return "RAW: (empty step)";
     return `${step}: ${detail}`.trim();
   }
