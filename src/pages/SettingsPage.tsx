@@ -16,16 +16,16 @@ type CreateStaffPayload = {
   staffId: string;
   displayName: string;
   password?: string;
-  action?: "upsert" | "debug" | "soft_delete" | "hard_delete" | "ping";
+  action?: "upsert" | "debug" | "soft_delete" | "restore" | "ping";
 };
 
 export default function SettingsPage() {
   const nav = useNavigate();
   const { t } = useI18n();
-  const enableHardDelete = import.meta.env.VITE_ENABLE_HARD_DELETE === "true";
 
   const [staff, setStaff] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newStaffId, setNewStaffId] = useState("");
   const [newName, setNewName] = useState("");
@@ -52,6 +52,11 @@ export default function SettingsPage() {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showInactive]);
 
   async function initAccess() {
     try {
@@ -92,10 +97,10 @@ export default function SettingsPage() {
     }
   }
 
-  async function reload() {
+  async function reload(includeInactive = showInactive) {
     setLoading(true);
     try {
-      const rows = await listStaffPublic();
+      const rows = await listStaffPublic({ includeInactive });
       setStaff(rows);
     } catch (e) {
       console.error(e);
@@ -308,7 +313,7 @@ export default function SettingsPage() {
     }
   }
 
-  async function onDeleteStaff(id: string, name: string, hard = false) {
+  async function onDeleteStaff(id: string, name: string) {
     if (accessRole !== "admin") {
       setEditErr(t("settings_admin_only"));
       return;
@@ -318,7 +323,7 @@ export default function SettingsPage() {
       const res = await invokeCreateStaff({
         staffId: id,
         displayName: name,
-        action: hard ? "hard_delete" : "soft_delete",
+        action: "soft_delete",
       });
 
       if (import.meta.env.DEV) {
@@ -335,6 +340,36 @@ export default function SettingsPage() {
       if (res && (res as any).authDeleted === false) {
         setEditMsg(t("settings_staff_deleted_banned"));
       }
+    } catch (e: any) {
+      console.error(e);
+      if (e?.message === "AUTH_REQUIRED") return handleAuthRequired();
+      if (e?.message === "WORKPLACE_ID_MISSING") {
+        setEditErr("WORKPLACE_ID_MISSING");
+        return;
+      }
+      const detail = buildErrorMessage(e);
+      const debug = await tryDebug(id);
+      const msg = [detail ?? e?.message ?? t("settings_staff_update_failed"), debug]
+        .filter(Boolean)
+        .join(" | ");
+      setEditErr(msg);
+    }
+  }
+
+  async function onRestoreStaff(id: string, name: string) {
+    if (accessRole !== "admin") {
+      setEditErr(t("settings_admin_only"));
+      return;
+    }
+
+    try {
+      await invokeCreateStaff({
+        staffId: id,
+        displayName: name,
+        action: "restore",
+      });
+
+      await reload();
     } catch (e: any) {
       console.error(e);
       if (e?.message === "AUTH_REQUIRED") return handleAuthRequired();
@@ -473,6 +508,17 @@ export default function SettingsPage() {
               <span className="settingsBadge">{staffCountLabel}</span>
             </div>
 
+            <div className="settingsStaffToggle">
+              <label className="settingsToggleLabel">
+                <input
+                  type="checkbox"
+                  checked={showInactive}
+                  onChange={(e) => setShowInactive(e.target.checked)}
+                />
+                <span>비활성 직원 보기</span>
+              </label>
+            </div>
+
             <div className="settingsCardBody">
               {loading ? (
                 <div className="settingsEmpty">{t("common_loading")}</div>
@@ -482,13 +528,17 @@ export default function SettingsPage() {
                 staff.map((s) => {
                   const label = s.name ?? (s as any).displayName ?? (s as any).staffId;
                   const isEditing = editingId === (s as any).staffId;
+                  const isInactive = s.isActive === false;
 
                   return (
                     <div key={(s as any).staffId} className="staffRowWrap">
-                      <div className="staffRow">
+                      <div className={`staffRow${isInactive ? " staffRowInactive" : ""}`}>
                         <div className="staffAvatar">{label.charAt(0)}</div>
                         <div className="staffInfo">
-                          <span className="staffName">{label}</span>
+                          <div className="staffNameRow">
+                            <span className="staffName">{label}</span>
+                            {isInactive && <span className="staffStatusBadge">비활성</span>}
+                          </div>
                           <span className="staffId">ID: {(s as any).staffId}</span>
                         </div>
 
@@ -514,24 +564,23 @@ export default function SettingsPage() {
                                 type="button"
                                 onClick={() => {
                                   if (!confirm(t("settings_confirm_delete_staff"))) return;
-                                  onDeleteStaff((s as any).staffId, label, false);
+                                  onDeleteStaff((s as any).staffId, label);
                                 }}
                                 disabled={accessRole !== "admin"}
                               >
                                 {t("settings_delete")}
                               </button>
 
-                              {import.meta.env.DEV && enableHardDelete && (
+                              {isInactive && (
                                 <button
-                                  className="settingsOutlineBtn dangerBtn"
+                                  className="settingsOutlineBtn"
                                   type="button"
                                   onClick={() => {
-                                    if (!confirm("HARD DELETE (DEV). Continue?")) return;
-                                    onDeleteStaff((s as any).staffId, label, true);
+                                    onRestoreStaff((s as any).staffId, label);
                                   }}
                                   disabled={accessRole !== "admin"}
                                 >
-                                  HARD
+                                  Restore
                                 </button>
                               )}
                             </>

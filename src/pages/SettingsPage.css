@@ -171,6 +171,26 @@
   gap: 0;
 }
 
+.settingsStaffToggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.settingsToggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5b6470;
+}
+
+.settingsToggleLabel input {
+  width: 16px;
+  height: 16px;
+}
+
 .settingsCardFooter {
   margin-top: 16px;
 }
@@ -216,6 +236,13 @@
   min-width: 0;
 }
 
+.staffNameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .staffName {
   font-size: 17px;
   font-weight: 700;
@@ -223,6 +250,21 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.staffStatusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.staffRowInactive .staffName,
+.staffRowInactive .staffId {
+  color: #9aa3ad;
 }
 
 .staffId {
@@ -361,7 +403,7 @@
     position: sticky;
     bottom: max(12px, env(safe-area-inset-bottom));
     background: #ffffff;
-    padding: 8px 0;
+    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
     z-index: 2;
   }
 
@@ -374,6 +416,7 @@
     bottom: max(12px, env(safe-area-inset-bottom));
     background: #ffffff;
     padding-top: 8px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
     z-index: 2;
   }
 }
