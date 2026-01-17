@@ -49,34 +49,22 @@ export async function fetchMyProfile(): Promise<ProfileRow> {
 async function ensureProfile() {
   const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
   if (sessionErr) throw sessionErr;
-  const token = sessionData.session?.access_token;
-  if (!token) throw new Error("AUTH_REQUIRED");
-  const userEmail = sessionData.session?.user?.email ?? "";
+  const session = sessionData.session ?? null;
+  if (!session) throw new Error("AUTH_REQUIRED");
+  const userEmail = session.user?.email ?? "";
   const staffId = userEmail.includes("@") ? userEmail.split("@")[0] : "";
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-  if (!supabaseUrl || !supabaseAnonKey) throw new Error("SUPABASE_ENV_MISSING");
-  const res = await fetch(`${supabaseUrl}/functions/v1/admin-create-staff`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      apikey: supabaseAnonKey,
-    },
-    body: JSON.stringify({ action: "ensure_profile", staffId: staffId || undefined }),
+  const { data, error } = await supabase.functions.invoke("admin-create-staff", {
+    body: { action: "ensure_profile", staffId: staffId || undefined },
   });
-  const text = await res.text();
-  let body: any = null;
-  try {
-    body = text ? JSON.parse(text) : null;
-  } catch {
-    body = text || null;
-  }
-  if (!res.ok) {
-    const err: any = new Error(`HTTP_${res.status}`);
-    err.__status = res.status;
+
+  if (error) {
+    const status =
+      (error as any)?.status ?? (error as any)?.context?.status ?? 500;
+    const body: any = data ?? (error as any)?.context?.body ?? error ?? null;
+    const err: any = new Error(`HTTP_${status}`);
+    err.__status = status;
     err.__body = body;
-    err.__rawText = text || null;
+    err.__rawText = null;
     throw err;
   }
 }

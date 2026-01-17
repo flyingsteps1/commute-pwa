@@ -114,9 +114,6 @@ type StaffPublicInsert = Database["public"]["Tables"]["staff_public"]["Insert"];
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ??
-  "";
-
 const VERSION = "DEPLOY_PROBE_2026_01_04";
 const PROBE = "PROBE_ADMIN_CREATE_STAFF__2026-01-04__A";
 
@@ -328,7 +325,7 @@ Deno.serve(async (req: Request) => {
       return json(200, { step: "PING", action: "ping" });
     }
 
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       return json(500, {
         step: "ENV_MISSING",
         error: "Missing Supabase env.",
@@ -357,10 +354,7 @@ Deno.serve(async (req: Request) => {
         global: { headers: { Authorization: authHeader } },
       },
     );
-    const adminClient: AnySupabaseClient = createClient(
-      SUPABASE_URL,
-      SUPABASE_SERVICE_ROLE_KEY,
-    );
+    const adminClient: AnySupabaseClient = supabaseUser;
 
     const { data: userData, error: userErr } = await supabaseUser.auth
       .getUser();
@@ -1185,3 +1179,4 @@ Deno.serve(async (req: Request) => {
     return json(500, { ok: false, step: "UNHANDLED", detail: toErr(e) });
   }
 });
+                                                                                                                                                                                

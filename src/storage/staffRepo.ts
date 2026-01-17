@@ -36,20 +36,25 @@ async function detectIsActiveColumn() {
   return hasIsActiveColumn;
 }
 
-export async function listStaffPublic(): Promise<StaffPublic[]> {
+export async function listStaffPublic(
+  options?: { includeInactive?: boolean },
+): Promise<StaffPublic[]> {
   const session = getAppSession();
   const workplaceId = session?.workplaceId ?? WORKPLACE_ID;
+  const includeInactive = options?.includeInactive ?? false;
 
-  const buildQuery = (withActive: boolean) => {
+  const buildQuery = (withActiveColumn: boolean, filterActive: boolean) => {
     let q = supabase
       .from("staff_public")
-      .select(withActive
-        ? "workplace_id, staff_id, display_name, sort_order, name, user_id, is_active"
-        : "workplace_id, staff_id, display_name, sort_order, name, user_id")
+      .select(
+        withActiveColumn
+          ? "workplace_id, staff_id, display_name, sort_order, name, user_id, is_active"
+          : "workplace_id, staff_id, display_name, sort_order, name, user_id",
+      )
       .order("sort_order", { ascending: true, nullsFirst: true })
       .order("staff_id", { ascending: true });
     if (workplaceId) q = q.eq("workplace_id", workplaceId);
-    if (withActive) q = q.eq("is_active", true);
+    if (filterActive) q = q.eq("is_active", true);
     return q;
   };
 
@@ -59,7 +64,7 @@ export async function listStaffPublic(): Promise<StaffPublic[]> {
 
   const canUseActive = await detectIsActiveColumn();
   {
-    const res = await buildQuery(canUseActive);
+    const res = await buildQuery(canUseActive, canUseActive && !includeInactive);
     data = res.data ?? null;
     error = res.error ?? null;
     status = res.status ?? null;
@@ -74,7 +79,7 @@ export async function listStaffPublic(): Promise<StaffPublic[]> {
   if (error && isMissingActive) {
     if (DEV) console.warn("[staffRepo.listStaffPublic] is_active missing, retry without filter");
     hasIsActiveColumn = false;
-    const res = await buildQuery(false);
+    const res = await buildQuery(false, false);
     data = res.data ?? null;
     error = res.error ?? null;
     status = res.status ?? null;
